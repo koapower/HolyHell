@@ -1,0 +1,3 @@
+ID,DisplayName,Type,Fraction,Godhood,Rarity,ActionCost,Effect1,EffectAtr1,EffectReq1,Effect2,EffectAtr2,EffectReq2,Effect3,EffectAtr3,EffectReq3,Effect4,EffectAtr4,EffectReq4,Description
+AngelBasic,Holy Bolt,Bliss,Angel,god1,1,1,SingleDamage,10,,SingleDamage,10,Ametervalue>=25,AMeterValue,10,,DMeterValue,-10,,"Deals 10 {icon:Bliss} damage.
+Deals 20 when {icon:Angelmeter} >= 25% instead."
