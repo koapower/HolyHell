@@ -2,15 +2,15 @@ public enum CardEffectType
 {
     None,
     SingleDamage,
+    AOEDamage,
+    SelfBuff,
+    TargetSingleBuff,
+    TargetAOEBuff,
+    InstDraw,
+    DeckBurn,
+    HandBurn,
+    CleanseSelf,
+    CastMore,
+    SelfDamage,
 
-    Heal,
-    Buff,
-    Debuff,
-    DrawCard,
-    DiscardCard,
-    Summon,
-    Transform,
-    Shield,
-    Poison,
-    Stun
 }

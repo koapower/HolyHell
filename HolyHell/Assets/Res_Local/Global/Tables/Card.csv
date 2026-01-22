@@ -1,3 +1,6 @@
-ID,DisplayName,Type,Fraction,Godhood,Rarity,ActionCost,Effect1,EffectAtr1,EffectReq1,Effect2,EffectAtr2,EffectReq2,Effect3,EffectAtr3,EffectReq3,Effect4,EffectAtr4,EffectReq4,Description
-AngelBasic,Holy Bolt,Bliss,Angel,god1,1,1,SingleDamage,10,,SingleDamage,10,Ametervalue>=25,AMeterValue,10,,DMeterValue,-10,,"Deals 10 {icon:Bliss} damage.
+ID,DisplayName,Type,Faction,Godhood,AvalueInc,DvalueInc,Rarity,ActionCost,Effect1,EffectAtr1,EffectReq1,Effect2,EffectAtr2,EffectReq2,Effect3,EffectAtr3,EffectReq3,Effect4,EffectAtr4,EffectReq4,VFX ID,Camera Type,Description
+AngelBasic,Holy Wrath,Bliss,Angel,Intereon,10,-10,1,1,SingleDamage,10,,SingleDamage,10,Ametervalue>=25,,,,,,,,,"Deals 10 {icon:Bliss} damage.
 Deals 20 when {icon:Angelmeter} >= 25% instead."
+NeutAttack,Soul Arrow,Enlightened,Neutral,,,,1,1,SingleDamage,4,,,,,,,,,,,,,Deals 4 {icon:type} damage.
+NeutDefence,Soul Barrier,Domination,Neutral,,,,1,1,SelfBuff,Guard,,,,,,,,,,,,,Gain {keyword:Guard}
+NeutAttack2,Soul Barrage,Domination,Neutral,,,,2,2,SingleDamage,8,,AOEDamage,8,,,,,,,,,,"Deals 16 {icon:Domination} damage to one target, and 8 to others."

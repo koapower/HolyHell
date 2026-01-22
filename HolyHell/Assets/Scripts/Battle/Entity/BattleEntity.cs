@@ -8,4 +8,12 @@ public class BattleEntity : MonoBehaviour
     public ReactiveProperty<int> shield = new ReactiveProperty<int>();
 
     public BuffHandler buffHandler = new BuffHandler();
+
+    protected virtual void OnDestroy()
+    {
+        // Dispose ReactiveProperties
+        hp?.Dispose();
+        maxHp?.Dispose();
+        shield?.Dispose();
+    }
 }
