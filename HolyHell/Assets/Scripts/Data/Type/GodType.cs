@@ -1,5 +1,5 @@
 public enum GodType
 {
     Mortal,
-    god1,
+    Intereon,
 }

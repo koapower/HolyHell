@@ -1,4 +1,6 @@
 // This class maps to the columns in Card.csv
+using UnityEngine.U2D.IK;
+
 public class CardRow
 {
     [Column("ID")]
@@ -10,17 +12,29 @@ public class CardRow
     [Column("Type")]
     public ElementType ElementType;
 
-    [Column("Fraction")]
-    public Fraction Fraction;
+    [Column("Faction")]
+    public Faction Faction;
 
     [Column("Godhood")]
     public GodType GodType;
+
+    [Column("AvalueInc")]
+    public int AngelGaugeIncrease;
+
+    [Column("DvalueInc")]
+    public int DemonGaugeIncrease;
 
     [Column("Rarity")]
     public int Rarity;
 
     [Column("ActionCost")]
     public int ActionCost;
+
+    [Column("VFX ID")]
+    public string VfxId;
+
+    [Column("CameraType")]
+    public string CameraType;
 
     [Column("Description")]
     public string Description;
