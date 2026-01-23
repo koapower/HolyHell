@@ -4,9 +4,9 @@ using TMPro;
 using R3;
 
 /// <summary>
-/// Displays player HP and shield
+/// Displays entity HP and shield
 /// </summary>
-public class PlayerStatusUI : MonoBehaviour
+public class EntityStatusUI : MonoBehaviour
 {
     [Header("HP Display")]
     [SerializeField] private Slider hpSlider;
@@ -18,27 +18,27 @@ public class PlayerStatusUI : MonoBehaviour
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
-    public void Initialize(PlayerEntity player)
+    public void Initialize(BattleEntity entity)
     {
-        if (player == null)
+        if (entity == null)
         {
-            Debug.LogError("PlayerStatusUI: Player is null!");
+            Debug.LogError("EntityStatusUI: entity is null!");
             return;
         }
 
         // Subscribe to HP changes
-        player.hp.Subscribe(hp =>
+        entity.hp.Subscribe(hp =>
         {
-            UpdateHP(hp, player.maxHp.Value);
+            UpdateHP(hp, entity.maxHp.Value);
         }).AddTo(disposables);
 
-        player.maxHp.Subscribe(maxHp =>
+        entity.maxHp.Subscribe(maxHp =>
         {
-            UpdateHP(player.hp.Value, maxHp);
+            UpdateHP(entity.hp.Value, maxHp);
         }).AddTo(disposables);
 
         // Subscribe to shield changes
-        player.shield.Subscribe(shield =>
+        entity.shield.Subscribe(shield =>
         {
             UpdateShield(shield);
         }).AddTo(disposables);

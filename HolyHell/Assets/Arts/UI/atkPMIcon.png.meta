@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 64b113b577915dc47830e6d6261714da
+guid: 1c5248ba0bdc2d5478c48886b1d7c39a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3488513438733249006
-    second: speaki_0
+      213: -8719415581515857489
+    second: atkPMIcon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: speaki_0
+      name: atkPMIcon_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 7
-        width: 476
-        height: 480
+        x: 0
+        y: 0
+        width: 310
+        height: 310
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ee92fd55d70b96030800000000000000
-      internalID: 3488513438733249006
+      spriteID: fa1cdbed9b96ef680800000000000000
+      internalID: -8719415581515857489
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      speaki_0: 3488513438733249006
+      atkPMIcon_0: -8719415581515857489
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

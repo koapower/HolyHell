@@ -8,7 +8,7 @@ using R3;
 public class BattleUI : MonoBehaviour
 {
     [Header("Player UI")]
-    [SerializeField] private PlayerStatusUI playerStatusUI;
+    [SerializeField] private EntityStatusUI playerStatusUI;
     [SerializeField] private GaugeDisplayUI gaugeDisplayUI;
     [SerializeField] private ActionPointUI actionPointUI;
     [SerializeField] private HandUI handUI;
