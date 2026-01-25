@@ -1,133 +1,177 @@
+using HolyHell.Battle.Effect;
+using HolyHell.Battle.Entity;
+using HolyHell.Battle.Logic;
+using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Executes card effects on targets
-/// </summary>
-public class CardEffectExecutor
+namespace HolyHell.Battle.Card
 {
-    private PlayerEntity player;
-    private EffectRequirementEvaluator requirementEvaluator;
-    private GaugeModifier gaugeModifier;
-    private DamageCalculator damageCalculator;
-
-    public CardEffectExecutor(PlayerEntity owner)
-    {
-        player = owner;
-        requirementEvaluator = new EffectRequirementEvaluator(owner);
-        gaugeModifier = new GaugeModifier(owner);
-        damageCalculator = new DamageCalculator();
-    }
-
     /// <summary>
-    /// Execute all effects of a card on target
+    /// Executes card effects on targets
+    /// Simplified version using Effect classes
     /// </summary>
-    public void ExecuteCard(CardInstance card, BattleEntity target)
+    public class CardEffectExecutor
     {
-        // Execute up to 4 effects
-        for (int i = 1; i <= 4; i++)
+        private BattleEntity caster;
+        private EffectRequirementEvaluator requirementEvaluator;
+        private EffectContext context;
+
+        public CardEffectExecutor(
+            BattleEntity caster,
+            CardDeckManager deckManager = null,
+            DelayedEffectQueue delayedQueue = null)
         {
-            ExecuteEffect(card, target, i);
+            this.caster = caster;
+            requirementEvaluator = new EffectRequirementEvaluator(caster as PlayerEntity);
+
+            // Initialize context
+            context = new EffectContext(caster, null, deckManager, delayedQueue);
         }
 
-        // Modify gauges after all effects
-        gaugeModifier.ModifyGauges(card.AngelGaugeIncrease, card.DemonGaugeIncrease);
-    }
-
-    /// <summary>
-    /// Execute a specific effect index (1-4)
-    /// </summary>
-    private void ExecuteEffect(CardInstance card, BattleEntity target, int effectIndex)
-    {
-        var effectType = card.GetEffectType(effectIndex);
-        if (effectType == CardEffectType.None)
+        /// <summary>
+        /// Update context with enemy and ally lists
+        /// </summary>
+        public void UpdateBattleLists(List<BattleEntity> enemies, List<BattleEntity> allies = null)
         {
-            return;
+            context.AllEnemies = enemies ?? new List<BattleEntity>();
+            context.AllAllies = allies ?? new List<BattleEntity>();
         }
 
-        // Check requirement
-        var requirement = card.GetEffectRequirement(effectIndex);
-        if (!requirementEvaluator.Evaluate(requirement))
+        /// <summary>
+        /// Execute all effects of a card on target
+        /// </summary>
+        public void ExecuteCard(CardInstance card, BattleEntity target)
         {
-            Debug.Log($"Effect {effectIndex} requirement not met: {requirement}");
-            return;
+            if (card == null || card.Effects == null)
+            {
+                Debug.LogWarning("CardEffectExecutor: Card or card effects are null");
+                return;
+            }
+
+            // Update context
+            context.Target = target;
+            context.CurrentCard = card;
+            context.KillOccurred = false;
+
+            // Execute all effects
+            foreach (var effect in card.Effects)
+            {
+                if (effect == null)
+                    continue;
+
+                bool killed = ExecuteEffect(effect);
+                if (killed)
+                {
+                    context.KillOccurred = true;
+                }
+            }
+
+            // Modify gauges after all effects
+            if (caster is PlayerEntity player)
+            {
+                player.ModifyAngelGauge(card.AngelGaugeIncrease);
+                player.ModifyDemonGauge(card.DemonGaugeIncrease);
+            }
         }
 
-        // Get effect value
-        string value = card.GetEffectValue(effectIndex);
-
-        // Execute based on effect type
-        switch (effectType)
+        /// <summary>
+        /// Execute a single effect
+        /// Returns true if effect caused a kill
+        /// </summary>
+        private bool ExecuteEffect(EffectBase effect)
         {
-            case CardEffectType.SingleDamage:
-                var numberParsed = float.TryParse(value, out float valueParsed);
-                ExecuteSingleDamage(target, valueParsed);
-                break;
+            // Check if this is a SpendRepeat effect
+            if (effect.IsSpendRepeat())
+            {
+                return ExecuteWithSpendRepeat(effect);
+            }
 
-            //case CardEffectType.Shield:
-            //    ExecuteShield(player, value);
-            //    break;
+            // Check requirement
+            if (!effect.CheckRequirement(context, requirementEvaluator))
+            {
+                Debug.Log($"Effect {effect.EffectType} requirement not met: {effect.Requirement}");
+                return false;
+            }
 
-            //case CardEffectType.Heal:
-            //    ExecuteHeal(player, value);
-            //    break;
-
-            //case CardEffectType.DrawCard:
-            //    ExecuteDrawCard((int)value);
-            //    break;
-
-            //case CardEffectType.DiscardCard:
-            //    ExecuteDiscardCard((int)value);
-            //    break;
-
-
-            default:
-                Debug.LogWarning($"Unknown effect type: {effectType}");
-                break;
-        }
-    }
-
-    private void ExecuteSingleDamage(BattleEntity target, float baseDamage)
-    {
-        if (target == null)
-        {
-            Debug.LogWarning("Target is null for damage effect");
-            return;
+            // Execute effect
+            return effect.Execute(context);
         }
 
-        float finalDamage = damageCalculator.CalculateDamage(baseDamage, player, target);
-        damageCalculator.ApplyDamage(target, finalDamage);
-    }
-
-    private void ExecuteShield(BattleEntity entity, float shieldAmount)
-    {
-        entity.shield.Value += (int)shieldAmount;
-        Debug.Log($"{entity.GetType().Name} gained {shieldAmount} shield");
-    }
-
-    private void ExecuteHeal(BattleEntity entity, float healAmount)
-    {
-        int newHp = Mathf.Min(entity.hp.Value + (int)healAmount, entity.maxHp.Value);
-        entity.hp.Value = newHp;
-        Debug.Log($"{entity.GetType().Name} healed for {healAmount} HP");
-    }
-
-    private void ExecuteDrawCard(int count)
-    {
-        if (player.deckManager != null)
+        /// <summary>
+        /// Execute effect with SpendRepeat mechanism
+        /// </summary>
+        private bool ExecuteWithSpendRepeat(EffectBase effect)
         {
-            player.deckManager.DrawCards(count);
-            Debug.Log($"Drew {count} cards");
-        }
-    }
+            if (!(caster is PlayerEntity player))
+            {
+                Debug.LogWarning("SpendRepeat can only be used by player");
+                return false;
+            }
 
-    private void ExecuteDiscardCard(int count)
-    {
-        // For now, discard random cards from hand
-        for (int i = 0; i < count && player.hand.Count > 0; i++)
-        {
-            var randomCard = player.hand[Random.Range(0, player.hand.Count)];
-            player.deckManager.DiscardCard(randomCard);
+            string paramString = effect.GetSpendRepeatParam();
+            if (paramString == null)
+            {
+                Debug.LogWarning("Failed to get SpendRepeat parameter");
+                return false;
+            }
+
+            // Calculate how many times we can repeat
+            int repeatCount = SpendRepeatExecutor.CalculateRepeatCount(paramString, player, out int actualSpent);
+
+            if (repeatCount <= 0)
+            {
+                Debug.Log("SpendRepeat: Cannot repeat (insufficient resources)");
+                return false;
+            }
+
+            // Consume resources
+            if (EffectValueParser.ParseSpendRepeatParams(paramString, out string resourceType, out _, out _))
+            {
+                SpendRepeatExecutor.ConsumeResource(resourceType, actualSpent, player);
+            }
+
+            // Execute effect multiple times
+            bool anyKillOccurred = false;
+            Debug.Log($"SpendRepeat: Executing effect {effect.EffectType} {repeatCount} times");
+
+            for (int i = 0; i < repeatCount; i++)
+            {
+                bool causedKill = effect.Execute(context);
+                if (causedKill)
+                {
+                    anyKillOccurred = true;
+                    context.KillOccurred = true;
+                }
+            }
+
+            return anyKillOccurred;
         }
-        Debug.Log($"Discarded {count} cards");
+
+        /// <summary>
+        /// Execute effects directly (for AI or special cases)
+        /// </summary>
+        public void ExecuteEffects(List<EffectBase> effects, BattleEntity target)
+        {
+            if (effects == null)
+            {
+                Debug.LogWarning("CardEffectExecutor: Effects list is null");
+                return;
+            }
+
+            context.Target = target;
+            context.KillOccurred = false;
+
+            foreach (var effect in effects)
+            {
+                if (effect == null)
+                    continue;
+
+                bool killed = ExecuteEffect(effect);
+                if (killed)
+                {
+                    context.KillOccurred = true;
+                }
+            }
+        }
     }
 }

@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using HolyHell.Battle.Entity;
 
-/// <summary>
-/// Manages deck, hand, and discard pile for a player
-/// </summary>
-public class DeckManager
+namespace HolyHell.Battle.Card
+{
+    /// <summary>
+    /// Manages deck, hand, and discard pile for a player
+    /// </summary>
+    public class DeckManager
 {
     private PlayerEntity player;
     private ITableManager tableManager;
@@ -125,4 +128,5 @@ public class DeckManager
     {
         DiscardCard(card);
     }
+}
 }

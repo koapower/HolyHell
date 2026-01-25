@@ -1,11 +1,14 @@
 using R3;
 using System.Collections.Generic;
 using UnityEngine;
+using HolyHell.Battle.Entity;
 
-/// <summary>
-/// Manages turn flow in battle
-/// </summary>
-public class TurnSystem
+namespace HolyHell.Battle
+{
+    /// <summary>
+    /// Manages turn flow in battle
+    /// </summary>
+    public class TurnSystem
 {
     private PlayerEntity player;
     private List<EnemyEntity> enemies;
@@ -127,13 +130,14 @@ public class TurnSystem
     }
 }
 
-/// <summary>
-/// Battle turn phases
-/// </summary>
-public enum TurnPhase
-{
-    BattleStart,
-    PlayerTurn,
-    EnemyTurn,
-    BattleEnd
+    /// <summary>
+    /// Battle turn phases
+    /// </summary>
+    public enum TurnPhase
+    {
+        BattleStart,
+        PlayerTurn,
+        EnemyTurn,
+        BattleEnd
+    }
 }

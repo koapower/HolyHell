@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using R3;
+using HolyHell.Battle;
 
 /// <summary>
 /// Displays victory or defeat screen

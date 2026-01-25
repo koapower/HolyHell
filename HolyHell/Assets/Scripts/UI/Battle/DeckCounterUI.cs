@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Displays draw pile and discard pile counts

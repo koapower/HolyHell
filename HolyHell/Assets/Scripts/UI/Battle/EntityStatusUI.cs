@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using R3;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Displays entity HP and shield

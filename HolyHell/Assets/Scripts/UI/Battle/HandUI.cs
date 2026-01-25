@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using HolyHell.Battle.Entity;
+using HolyHell.Battle.Card;
 
 /// <summary>
 /// Displays and manages player's hand of cards

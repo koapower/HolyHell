@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Manages multiple enemy UI displays

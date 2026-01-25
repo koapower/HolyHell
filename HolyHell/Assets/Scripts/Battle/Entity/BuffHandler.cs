@@ -1,29 +1,59 @@
 using System.Collections.Generic;
+using System.Linq;
+using HolyHell.Battle.Logic.Buffs;
 using UnityEngine;
 
-public class BuffHandler
+namespace HolyHell.Battle.Entity
+{
+    public class BuffHandler
 {
     public List<BuffBase> activeBuffs = new List<BuffBase>();
+    private BattleEntity owner;
+
+    public BuffHandler(BattleEntity owner)
+    {
+        this.owner = owner;
+    }
 
     /// <summary>
-    /// Add a buff (or increase stack if already exists)
+    /// Add a buff (or increase stack/refresh duration if already exists)
     /// </summary>
     public void AddBuff(BuffBase buff)
     {
+        if (buff == null)
+        {
+            Debug.LogWarning("Attempted to add null buff");
+            return;
+        }
+
+        // Set owner reference
+        buff.SetOwner(owner);
+
         // Check if buff already exists
         var existingBuff = activeBuffs.Find(b => b.Id == buff.Id);
 
         if (existingBuff != null)
         {
-            // Stack the buff
-            existingBuff.StackCount += buff.StackCount;
-            Debug.Log($"Buff {buff.Id} stacked to {existingBuff.StackCount}");
+            // Check if buff is stackable
+            if (existingBuff.IsStackable)
+            {
+                // Stack the buff (increase stack count)
+                existingBuff.StackCount += buff.StackCount;
+                Debug.Log($"Buff {buff.Id} stacked to {existingBuff.StackCount}");
+            }
+            else
+            {
+                // Non-stackable: refresh duration instead
+                existingBuff.Duration = buff.Duration;
+                Debug.Log($"Buff {buff.Id} duration refreshed to {buff.Duration}");
+            }
         }
         else
         {
             // Add new buff
             activeBuffs.Add(buff);
-            Debug.Log($"Buff {buff.Id} added with {buff.StackCount} stacks");
+            buff.OnApplied();
+            Debug.Log($"Buff {buff.Id} added with {buff.StackCount} stacks and {buff.Duration} duration");
         }
     }
 
@@ -47,6 +77,55 @@ public class BuffHandler
             finalDamage = buff.OnCalculateDamage(finalDamage);
         }
         return finalDamage;
+    }
+
+    /// <summary>
+    /// Get modified damage (incoming)
+    /// </summary>
+    public float GetModifiedIncomingDamage(float baseDamage)
+    {
+        float finalDamage = baseDamage;
+        foreach (var buff in activeBuffs)
+        {
+            finalDamage = buff.OnReceiveDamage(finalDamage);
+        }
+        return finalDamage;
+    }
+
+    /// <summary>
+    /// Check if entity has a specific buff
+    /// </summary>
+    public bool HasBuff(string buffId)
+    {
+        return activeBuffs.Any(b => b.Id == buffId);
+    }
+
+    /// <summary>
+    /// Get a specific buff by ID
+    /// </summary>
+    public BuffBase GetBuff(string buffId)
+    {
+        return activeBuffs.Find(b => b.Id == buffId);
+    }
+
+    /// <summary>
+    /// Remove specified number of debuffs (for CleanseSelf effect)
+    /// </summary>
+    public int RemoveDebuffs(int count)
+    {
+        var debuffs = activeBuffs.Where(b => !b.IsPositive).ToList();
+        int removedCount = 0;
+
+        for (int i = 0; i < count && i < debuffs.Count; i++)
+        {
+            var debuff = debuffs[i];
+            debuff.OnRemoved();
+            activeBuffs.Remove(debuff);
+            removedCount++;
+            Debug.Log($"Debuff {debuff.Id} removed by cleanse");
+        }
+
+        return removedCount;
     }
 
     /// <summary>
@@ -82,14 +161,14 @@ public class BuffHandler
     /// </summary>
     private void RemoveExpiredBuffs()
     {
-        activeBuffs.RemoveAll(b =>
+        var expiredBuffs = activeBuffs.Where(b => b.Duration <= 0 && b.Duration != -1).ToList();
+
+        foreach (var buff in expiredBuffs)
         {
-            if (b.Duration <= 0 && b.Duration != -1) // -1 = permanent
-            {
-                Debug.Log($"Buff {b.Id} expired");
-                return true;
-            }
-            return false;
-        });
+            buff.OnRemoved();
+            activeBuffs.Remove(buff);
+            Debug.Log($"Buff {buff.Id} expired");
+        }
     }
+}
 }

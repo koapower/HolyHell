@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using R3;
 using System.Collections.Generic;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Displays player action points (energy)

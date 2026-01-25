@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using System;
+using HolyHell.Battle.Card;
 
 /// <summary>
 /// Displays a single card in hand

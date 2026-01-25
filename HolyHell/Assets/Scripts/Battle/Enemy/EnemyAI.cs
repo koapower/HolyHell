@@ -1,17 +1,32 @@
+using HolyHell.Battle.Card;
+using HolyHell.Battle.Effect;
+using HolyHell.Battle.Entity;
+using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Simple AI for enemy decision making
-/// </summary>
-public class EnemyAI
+namespace HolyHell.Battle.Enemy
+{
+    /// <summary>
+    /// Simple AI for enemy decision making
+    /// Uses the new Effect system
+    /// </summary>
+    public class EnemyAI
 {
     private EnemyEntity enemy;
-    private DamageCalculator damageCalculator;
+    private CardEffectExecutor effectExecutor;
 
     public EnemyAI(EnemyEntity owner)
     {
         enemy = owner;
-        damageCalculator = new DamageCalculator();
+        effectExecutor = new CardEffectExecutor(owner);
+    }
+
+    /// <summary>
+    /// Update battle context (should be called at battle start and when entities change)
+    /// </summary>
+    public void UpdateBattleContext(List<BattleEntity> enemies, List<BattleEntity> allies)
+    {
+        effectExecutor.UpdateBattleLists(enemies, allies);
     }
 
     /// <summary>
@@ -35,7 +50,7 @@ public class EnemyAI
     }
 
     /// <summary>
-    /// Execute a skill on target
+    /// Execute a skill on target using the new Effect system
     /// </summary>
     public void ExecuteSkill(MonsterSkillRow skill, BattleEntity target)
     {
@@ -45,87 +60,67 @@ public class EnemyAI
             return;
         }
 
+        if (target == null)
+        {
+            Debug.LogWarning("Target is null, cannot execute skill");
+            return;
+        }
+
         Debug.Log($"Enemy {enemy.enemyData?.DisplayName} uses {skill.DisplayName}!");
 
-        // Execute up to 3 effects
-        for (int i = 1; i <= 3; i++)
-        {
-            ExecuteEffect(skill, target, i);
-        }
+        // Apply base attack modifier to damage effects
+        var modifiedEffects = ApplyBaseAttackModifier(skill.Effects);
+
+        // Execute all effects
+        effectExecutor.ExecuteEffects(modifiedEffects, target);
     }
 
     /// <summary>
-    /// Execute a specific effect from skill
+    /// Apply base attack modifier from enemy data to damage effects
     /// </summary>
-    private void ExecuteEffect(MonsterSkillRow skill, BattleEntity target, int effectIndex)
+    private List<EffectBase> ApplyBaseAttackModifier(List<EffectBase> effects)
     {
-        var effectType = skill.GetEffectType(effectIndex);
-        if (effectType == CardEffectType.None)
+        if (enemy.enemyData == null || effects == null)
         {
-            return;
+            return effects;
         }
 
-        float value = skill.GetEffectValue(effectIndex);
+        float baseAtkMultiplier = enemy.enemyData.BaseAtk / 100f;
+        var modifiedEffects = new List<EffectBase>();
 
-        switch (effectType)
+        foreach (var effect in effects)
         {
-            case CardEffectType.SingleDamage:
-                ExecuteDamage(target, value);
-                break;
+            if (effect == null)
+                continue;
 
-            //case CardEffectType.Shield:
-            //    ExecuteShield(value);
-            //    break;
+            // Clone the effect to avoid modifying the original
+            var clonedEffect = effect.Clone();
 
-            //case CardEffectType.Buff:
-            //    // TODO: Implement buff application
-            //    Debug.Log($"Enemy buff not yet implemented: {value}");
-            //    break;
+            // Apply base attack modifier to damage effects
+            if (clonedEffect is SingleDamageEffect ||
+                clonedEffect is AOEDamageEffect ||
+                clonedEffect is SelfDamageEffect ||
+                clonedEffect is DelaySingleDamageEffect ||
+                clonedEffect is DelayAOEDamageEffect)
+            {
+                // Parse current value and apply modifier
+                int originalDamage = int.Parse(clonedEffect.Value);
+                int modifiedDamage = Mathf.RoundToInt(originalDamage * baseAtkMultiplier);
+                clonedEffect.Value = modifiedDamage.ToString();
+            }
 
-            //case CardEffectType.Debuff:
-            //    // TODO: Implement debuff application
-            //    Debug.Log($"Enemy debuff not yet implemented: {value}");
-            //    break;
-
-            //case CardEffectType.Heal:
-            //    ExecuteHeal(value);
-            //    break;
-
-            default:
-                Debug.LogWarning($"Enemy effect type not supported: {effectType}");
-                break;
-        }
-    }
-
-    private void ExecuteDamage(BattleEntity target, float baseDamage)
-    {
-        if (target == null)
-        {
-            Debug.LogWarning("Target is null for damage");
-            return;
+            modifiedEffects.Add(clonedEffect);
         }
 
-        // Apply base attack modifier from enemy data
-        float modifiedDamage = baseDamage;
-        if (enemy.enemyData != null)
-        {
-            modifiedDamage = baseDamage * (enemy.enemyData.BaseAtk / 100f);
-        }
-
-        float finalDamage = damageCalculator.CalculateDamage(modifiedDamage, enemy, target);
-        damageCalculator.ApplyDamage(target, finalDamage);
+        return modifiedEffects;
     }
 
-    private void ExecuteShield(float shieldAmount)
+    /// <summary>
+    /// Get CardEffectExecutor for external use (if needed)
+    /// </summary>
+    public CardEffectExecutor GetEffectExecutor()
     {
-        enemy.shield.Value += (int)shieldAmount;
-        Debug.Log($"Enemy gained {shieldAmount} shield");
+        return effectExecutor;
     }
-
-    private void ExecuteHeal(float healAmount)
-    {
-        int newHp = Mathf.Min(enemy.hp.Value + (int)healAmount, enemy.maxHp.Value);
-        enemy.hp.Value = newHp;
-        Debug.Log($"Enemy healed for {healAmount} HP");
-    }
+}
 }

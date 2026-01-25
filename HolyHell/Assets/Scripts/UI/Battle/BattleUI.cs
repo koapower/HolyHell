@@ -1,6 +1,9 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using R3;
+using HolyHell.Battle;
+using HolyHell.Battle.Card;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Main battle UI controller - manages all battle UI components

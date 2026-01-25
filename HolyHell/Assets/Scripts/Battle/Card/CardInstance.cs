@@ -1,9 +1,13 @@
+using HolyHell.Battle.Effect;
 using System;
+using System.Collections.Generic;
 
-/// <summary>
-/// Runtime instance of a card, based on CardRow data
-/// </summary>
-public class CardInstance
+namespace HolyHell.Battle.Card
+{
+    /// <summary>
+    /// Runtime instance of a card, based on CardRow data
+    /// </summary>
+    public class CardInstance
 {
     // Reference to static card data
     public CardRow cardData;
@@ -11,11 +15,17 @@ public class CardInstance
     // Runtime instance ID
     public Guid instanceId;
 
+    // Runtime effects (can be dynamically modified)
+    public List<EffectBase> Effects { get; set; }
+
     // Constructor
     public CardInstance(CardRow data)
     {
         cardData = data;
         instanceId = Guid.NewGuid();
+
+        // Initialize effects from card data
+        Effects = EffectFactory.CreateEffectsFromCardRow(data);
     }
 
     // Convenience accessors
@@ -61,4 +71,5 @@ public class CardInstance
             _ => string.Empty
         };
     }
+}
 }

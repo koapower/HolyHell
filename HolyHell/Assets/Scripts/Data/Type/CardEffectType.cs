@@ -12,5 +12,7 @@ public enum CardEffectType
     CleanseSelf,
     CastMore,
     SelfDamage,
+    DelaySingleDamage,
+    DelayAOEDamage,
 
 }

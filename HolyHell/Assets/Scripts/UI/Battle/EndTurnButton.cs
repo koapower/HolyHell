@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using R3;
+using HolyHell.Battle;
 
 /// <summary>
 /// Button to end player's turn

@@ -1,3 +1,6 @@
+using HolyHell.Battle.Effect;
+using System.Collections.Generic;
+
 /// <summary>
 /// Monster skill data from MonsterSkill.csv
 /// CSV headers: ID, DisplayName, Type, Effect1, EffectAtr1, Effect2, EffectAtr2, Effect3, EffectAtr3, VFX ID
@@ -37,6 +40,51 @@ public class MonsterSkillRow
     // VFX
     [Column("VFX ID")]
     public string VfxId;
+
+    // Runtime effects (lazy initialized)
+    private List<EffectBase> effects;
+    public List<EffectBase> Effects
+    {
+        get
+        {
+            if (effects == null)
+            {
+                effects = CreateEffects();
+            }
+            return effects;
+        }
+    }
+
+    /// <summary>
+    /// Create effect instances from skill data
+    /// </summary>
+    private List<EffectBase> CreateEffects()
+    {
+        var effectList = new List<EffectBase>();
+
+        // Effect 1
+        if (Effect1Type != CardEffectType.None)
+        {
+            var effect = EffectFactory.CreateEffect(Effect1Type, Effect1Value.ToString());
+            if (effect != null) effectList.Add(effect);
+        }
+
+        // Effect 2
+        if (Effect2Type != CardEffectType.None)
+        {
+            var effect = EffectFactory.CreateEffect(Effect2Type, Effect2Value.ToString());
+            if (effect != null) effectList.Add(effect);
+        }
+
+        // Effect 3
+        if (Effect3Type != CardEffectType.None)
+        {
+            var effect = EffectFactory.CreateEffect(Effect3Type, Effect3Value.ToString());
+            if (effect != null) effectList.Add(effect);
+        }
+
+        return effectList;
+    }
 
     /// <summary>
     /// Get effect type by index (1-3)

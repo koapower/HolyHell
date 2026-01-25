@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using R3;
 using System;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Displays a single enemy's status and intent

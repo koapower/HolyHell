@@ -1,4 +1,7 @@
 using UnityEngine;
+using HolyHell.Battle;
+using HolyHell.Battle.Card;
+using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Handles target selection for cards

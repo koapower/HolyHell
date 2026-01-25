@@ -1,19 +1,28 @@
 using R3;
 using UnityEngine;
 
-public class BattleEntity : MonoBehaviour
+namespace HolyHell.Battle.Entity
 {
-    public ReactiveProperty<int> hp = new ReactiveProperty<int>();
-    public ReactiveProperty<int> maxHp = new ReactiveProperty<int>();
-    public ReactiveProperty<int> shield = new ReactiveProperty<int>();
-
-    public BuffHandler buffHandler = new BuffHandler();
-
-    protected virtual void OnDestroy()
+    public class BattleEntity : MonoBehaviour
     {
-        // Dispose ReactiveProperties
-        hp?.Dispose();
-        maxHp?.Dispose();
-        shield?.Dispose();
+        public ReactiveProperty<int> hp = new ReactiveProperty<int>();
+        public ReactiveProperty<int> maxHp = new ReactiveProperty<int>();
+        public ReactiveProperty<int> shield = new ReactiveProperty<int>();
+
+        public BuffHandler buffHandler;
+
+        protected virtual void Awake()
+        {
+            // Initialize BuffHandler with this entity as owner
+            buffHandler = new BuffHandler(this);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            // Dispose ReactiveProperties
+            hp?.Dispose();
+            maxHp?.Dispose();
+            shield?.Dispose();
+        }
     }
 }
