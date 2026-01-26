@@ -8,7 +8,7 @@ using HolyHell.Battle.Entity;
 /// <summary>
 /// Main battle UI controller - manages all battle UI components
 /// </summary>
-public class BattleUI : MonoBehaviour
+public class BattleUI : MonoBehaviour, IUIInitializable
 {
     [Header("Player UI")]
     [SerializeField] private EntityStatusUI playerStatusUI;
@@ -30,6 +30,12 @@ public class BattleUI : MonoBehaviour
 
     private BattleManager battleManager;
     private CompositeDisposable disposables = new CompositeDisposable();
+
+    public async UniTask Init()
+    {
+        var battleManager = await ServiceLocator.Instance.GetAsync<IBattleManager>();
+        Initialize(battleManager as BattleManager);
+    }
 
     /// <summary>
     /// Initialize all UI components with battle manager

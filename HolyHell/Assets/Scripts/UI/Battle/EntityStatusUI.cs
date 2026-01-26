@@ -44,7 +44,7 @@ public class EntityStatusUI : MonoBehaviour
             UpdateShield(shield);
         }).AddTo(disposables);
 
-        Debug.Log("PlayerStatusUI initialized");
+        Debug.Log("EntityStatusUI initialized");
     }
 
     private void UpdateHP(int hp, int maxHp)

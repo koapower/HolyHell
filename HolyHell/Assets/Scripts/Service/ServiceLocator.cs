@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using HolyHell.Battle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +65,7 @@ public class ServiceLocator : MonoSingleton<ServiceLocator>
         Register<IAssetLoader>(() => new AssetLoader());
         Register<ITableManager>(() => new TableManager());
         //Register<ISceneManagementService>(() => new SceneManagementService());
+        Register<IBattleManager>(() => new BattleManager(Get<ITableManager>()));
 
     }
 

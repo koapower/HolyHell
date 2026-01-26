@@ -15,13 +15,8 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     [Header("Enemy Info")]
     [SerializeField] private TextMeshProUGUI nameText;
 
-    [Header("HP Display")]
-    [SerializeField] private Slider hpSlider;
-    [SerializeField] private TextMeshProUGUI hpText;
-
-    [Header("Shield Display")]
-    [SerializeField] private TextMeshProUGUI shieldText;
-    [SerializeField] private GameObject shieldIcon;
+    [Header("HP&Shield Display")]
+    [SerializeField] private EntityStatusUI statusUI;
 
     [Header("Intent Display")]
     [SerializeField] private TextMeshProUGUI intentText;
@@ -57,23 +52,7 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
             nameText.text = enemy.enemyData.DisplayName;
         }
 
-        // Subscribe to HP changes
-        enemy.hp.Subscribe(hp =>
-        {
-            UpdateHP(hp, enemy.maxHp.Value);
-            CheckIfDead(hp);
-        }).AddTo(disposables);
-
-        enemy.maxHp.Subscribe(maxHp =>
-        {
-            UpdateHP(enemy.hp.Value, maxHp);
-        }).AddTo(disposables);
-
-        // Subscribe to shield changes
-        enemy.shield.Subscribe(shield =>
-        {
-            UpdateShield(shield);
-        }).AddTo(disposables);
+        statusUI.Initialize(enemy);
 
         // Subscribe to intent changes
         enemy.currentIntent.Subscribe(intent =>
@@ -82,33 +61,6 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         }).AddTo(disposables);
 
         Debug.Log($"EnemyUI initialized for {enemy.enemyData?.DisplayName}");
-    }
-
-    private void UpdateHP(int hp, int maxHp)
-    {
-        if (hpText != null)
-        {
-            hpText.text = $"{hp} / {maxHp}";
-        }
-
-        if (hpSlider != null)
-        {
-            hpSlider.maxValue = maxHp;
-            hpSlider.value = hp;
-        }
-    }
-
-    private void UpdateShield(int shield)
-    {
-        if (shieldText != null)
-        {
-            shieldText.text = shield > 0 ? shield.ToString() : "";
-        }
-
-        if (shieldIcon != null)
-        {
-            shieldIcon.SetActive(shield > 0);
-        }
     }
 
     private void UpdateIntent(MonsterSkillRow intent)

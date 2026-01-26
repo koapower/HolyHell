@@ -11,10 +11,18 @@ public class FanLayoutGroup : MonoBehaviour
     [Header("Rotation")]
     public bool rotateCards = true;   // Whether cards should rotate to follow the arc
 
+#if UNITY_EDITOR
+    [Header("Editor Only")]
+    public bool enableUpdateOnValidate = true; // Whether to update layout on property changes
+#endif
+
+#if UNITY_EDITOR
     void OnValidate()
     {
-        LayoutCards();
+        if (enableUpdateOnValidate)
+            LayoutCards();
     }
+#endif
 
     [ContextMenu("Execute Layout Now")]
     public void LayoutCards()
@@ -54,6 +62,10 @@ public class FanLayoutGroup : MonoBehaviour
             // Calculate position on the arc (x = sin * r, y = cos * r)
             float x = Mathf.Sin(radian) * radius;
             float y = Mathf.Cos(radian) * radius;
+
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(child, "Fan Layout Update");
+#endif
 
             // Apply position relative to the calculated circle center
             child.localPosition = centerPosition + new Vector3(x, y, 0);

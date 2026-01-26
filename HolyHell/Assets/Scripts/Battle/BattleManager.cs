@@ -11,7 +11,7 @@ namespace HolyHell.Battle
     /// Main battle controller - orchestrates entire battle flow
     /// Implements IGameService for service locator pattern
     /// </summary>
-    public class BattleManager : IGameService
+    public class BattleManager : IBattleManager
     {
         // Battle entities
         public PlayerEntity player;
@@ -27,13 +27,17 @@ namespace HolyHell.Battle
         // Table managers
         private ITableManager tableManager;
 
+        public BattleManager(ITableManager tableManager)
+        {
+            this.tableManager = tableManager;
+        }
+
         /// <summary>
         /// Initialize service (called by ServiceLocator)
         /// </summary>
-        public async UniTask Init()
+        public UniTask Init()
         {
-            tableManager = await ServiceLocator.Instance.GetAsync<ITableManager>();
-            Debug.Log("BattleManager initialized");
+            return UniTask.CompletedTask;
         }
 
         /// <summary>
