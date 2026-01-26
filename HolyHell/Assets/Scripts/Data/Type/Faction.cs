@@ -4,5 +4,4 @@ public enum Faction
     Neutral = 1,
     Angel,
     Demon,
-    Human,
 }

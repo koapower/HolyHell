@@ -118,7 +118,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             Faction.Angel => new Color(1f, 0.9f, 0.5f), // Light gold
             Faction.Demon => new Color(0.6f, 0.2f, 0.8f), // Dark purple
-            Faction.Human => new Color(0.8f, 0.8f, 0.8f), // Gray
             _ => Color.white // Neutral
         };
     }

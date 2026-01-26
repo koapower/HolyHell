@@ -9,6 +9,7 @@ using HolyHell.Battle.Card;
 /// </summary>
 public class HandUI : MonoBehaviour
 {
+    [SerializeField] private FanLayoutGroup fanLayoutGroup;
     [SerializeField] private Transform cardContainer;
     [SerializeField] private GameObject cardUIPrefab;
 
@@ -37,11 +38,12 @@ public class HandUI : MonoBehaviour
     private void Update()
     {
         // Simple polling to detect hand changes
-        // In a production system, you'd use events or ReactiveCollection
+        // TODO use events or ReactiveCollection
         if (player != null && player.hand.Count != lastHandCount)
         {
             lastHandCount = player.hand.Count;
             RebuildHand();
+            fanLayoutGroup.LayoutCards();
         }
 
         // Update playability based on action points
