@@ -6,8 +6,8 @@ namespace HolyHell.Battle.Logic.Buffs
     public abstract class BuffBase
     {
         public string Id;
-        public ReactiveProperty<int> StackCount;
-        public ReactiveProperty<int> Duration; // -1 = permanent, 0+ = turns remaining
+        public ReactiveProperty<int> StackCount = new ReactiveProperty<int>();
+        public ReactiveProperty<int> Duration = new ReactiveProperty<int>(); // -1 = permanent, 0+ = turns remaining
         public abstract bool IsStackable { get; }
         public abstract bool IsPositive { get; }
 

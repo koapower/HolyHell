@@ -27,7 +27,7 @@ namespace HolyHell.Battle.Logic.Buffs
             if (Owner != null)
             {
                 // Calculate heal amount based on percentage of max HP
-                int healAmount = Mathf.RoundToInt(Owner.maxHp.CurrentValue * healPercentage / 100f);
+                int healAmount = GameMath.RoundToInt(Owner.maxHp.CurrentValue * healPercentage / 100f);
 
                 if (healAmount > 0)
                 {

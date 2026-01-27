@@ -14,7 +14,7 @@ public class MonsterSkillRow
     public string DisplayName;
 
     [Column("Type")]
-    public string Type; // Attack, Buff, Debuff, etc.
+    public ElementType ElementType;
 
     // Effect 1
     [Column("Effect1")]
@@ -38,8 +38,11 @@ public class MonsterSkillRow
     public float Effect3Value;
 
     // VFX
-    [Column("VFX ID")]
+    [Column("VFX")]
     public string VfxId;
+
+    [Column("SkillDes")]
+    public string Description;
 
     // Runtime effects (lazy initialized)
     private List<EffectBase> effects;

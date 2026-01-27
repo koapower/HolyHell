@@ -5,6 +5,7 @@ using TMPro;
 using R3;
 using System;
 using HolyHell.Battle.Entity;
+using HolyHell.Battle.Enemy;
 
 /// <summary>
 /// Displays a single enemy's status and intent
@@ -65,13 +66,13 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         Debug.Log($"EnemyUI initialized for {enemy.enemyData?.DisplayName}");
     }
 
-    private void UpdateIntent(MonsterSkillRow intent)
+    private void UpdateIntent(EnemySkill intent)
     {
         if (intentText != null)
         {
             if (intent != null)
             {
-                intentText.text = $"Intent: {intent.DisplayName}";
+                intentText.text = $"Intent: {intent.DataRow.DisplayName}";
             }
             else
             {

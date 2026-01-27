@@ -27,7 +27,7 @@ namespace HolyHell.Battle.Logic.Buffs
             if (Owner != null)
             {
                 // Calculate damage based on percentage of max HP per stack
-                int damageAmount = Mathf.RoundToInt(Owner.maxHp.CurrentValue * damagePercentage / 100f * StackCount.Value);
+                int damageAmount = GameMath.RoundToInt(Owner.maxHp.CurrentValue * damagePercentage / 100f * StackCount.Value);
 
                 if (damageAmount > 0)
                 {

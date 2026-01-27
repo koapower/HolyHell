@@ -1,9 +1,10 @@
+using Cysharp.Threading.Tasks;
+using HolyHell.Battle.Card;
+using HolyHell.Battle.Enemy;
+using HolyHell.Battle.Entity;
 using R3;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
-using HolyHell.Battle.Entity;
-using HolyHell.Battle.Card;
 
 namespace HolyHell.Battle
 {
@@ -131,14 +132,17 @@ namespace HolyHell.Battle
                 var enemy = enemyGO.AddComponent<EnemyEntity>();
 
                 // Load skills
-                var skillIds = enemyData.GetSkillIds();
-                var skills = new List<MonsterSkillRow>();
-                foreach (var skillId in skillIds)
+                var skills = new List<EnemySkill>();
+                for (int i = 1; i <= 3; i++)
                 {
-                    var skill = skillTable.GetRow(s => s.Id == skillId.Trim());
-                    if (skill != null)
+                    var tuple = enemyData.GetSkillByIndex(i);
+                    if (!string.IsNullOrEmpty(tuple.skillName))
                     {
-                        skills.Add(skill);
+                        var skill = skillTable.GetRow(s => s.Id == tuple.skillName.Trim());
+                        if (skill != null)
+                        {
+                            skills.Add(new EnemySkill(tuple.stringReq.Trim(), skill));
+                        }
                     }
                 }
 

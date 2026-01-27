@@ -106,7 +106,7 @@ namespace HolyHell.Battle.Logic
             DamageCalculator.ApplyDamage(
                 effect.SingleTarget,
                 effect.Caster,
-                Mathf.RoundToInt(finalDamage)
+                GameMath.RoundToInt(finalDamage)
             );
         }
 
@@ -144,7 +144,7 @@ namespace HolyHell.Battle.Logic
                     DamageCalculator.ApplyDamage(
                         target,
                         effect.Caster,
-                        Mathf.RoundToInt(finalDamage)
+                        GameMath.RoundToInt(finalDamage)
                     );
                 }
             }

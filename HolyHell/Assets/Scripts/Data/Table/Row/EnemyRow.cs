@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+
+
 /// <summary>
 /// Enemy data from Enemy.csv
 /// CSV headers: ID, DisplayName, HP, BaseAtk, Des, Enl, Bli, Rav, Dom, Skill
@@ -17,35 +20,45 @@ public class EnemyRow
     public int BaseAtk;
 
     // Resistances (element damage reduction percentages)
-    [Column("Des")]
+    [Column("DesRes")]
     public int DespairResistance;
 
-    [Column("Enl")]
+    [Column("EnlRes")]
     public int EnlightenedResistance;
 
-    [Column("Bli")]
+    [Column("BliRes")]
     public int BlissResistance;
 
-    [Column("Rav")]
+    [Column("RavRes")]
     public int RavenousResistance;
 
-    [Column("Dom")]
+    [Column("DomRes")]
     public int DominationResistance;
 
-    // Skill IDs (comma-separated)
-    [Column("Skill")]
-    public string Skills;
+    // Skills
+    [Column("Skill1")]
+    public string Skill1Name;
+    [Column("SkillReq1")]
+    public string Skill1Requirement;
 
-    /// <summary>
-    /// Parse skill IDs from comma-separated string
-    /// </summary>
-    public string[] GetSkillIds()
+    [Column("Skill2")]
+    public string Skill2Name;
+    [Column("SkillReq2")]
+    public string Skill2Requirement;
+
+    [Column("Skill3")]
+    public string Skill3Name;
+    [Column("SkillReq3")]
+    public string Skill3Requirement;
+
+    public (string skillName, string stringReq) GetSkillByIndex(int index)
     {
-        if (string.IsNullOrEmpty(Skills))
+        return index switch
         {
-            return new string[0];
-        }
-
-        return Skills.Split(',');
+            1 => (Skill1Name, Skill1Requirement),
+            2 => (Skill2Name, Skill2Requirement),
+            3 => (Skill3Name, Skill3Requirement),
+            _ => (null, null),
+        };
     }
 }

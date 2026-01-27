@@ -26,7 +26,7 @@ namespace HolyHell.Battle.Effect
 
             int baseDamage = EffectValueParser.ParseInt(Value);
             float finalDamage = DamageCalculator.CalculateDamage(baseDamage, context.Caster, context.Target);
-            bool killed = DamageCalculator.ApplyDamage(context.Target, context.Caster, Mathf.RoundToInt(finalDamage));
+            bool killed = DamageCalculator.ApplyDamage(context.Target, context.Caster, GameMath.RoundToInt(finalDamage));
 
             return killed;
         }

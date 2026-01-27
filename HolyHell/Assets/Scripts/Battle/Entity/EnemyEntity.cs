@@ -10,15 +10,15 @@ namespace HolyHell.Battle.Entity
         public EnemyRow enemyData;
 
         // Current intent (what the enemy will do next turn)
-        public ReactiveProperty<MonsterSkillRow> currentIntent = new ReactiveProperty<MonsterSkillRow>();
+        public ReactiveProperty<EnemySkill> currentIntent = new ReactiveProperty<EnemySkill>();
 
         // Available skills
-        public List<MonsterSkillRow> availableSkills = new List<MonsterSkillRow>();
+        public List<EnemySkill> availableSkills = new List<EnemySkill>();
 
         // AI reference
         public EnemyAI ai;
 
-        public void Initialize(EnemyRow data, List<MonsterSkillRow> skills)
+        public void Initialize(EnemyRow data, List<EnemySkill> skills)
         {
             enemyData = data;
             availableSkills = skills;
