@@ -1,9 +1,10 @@
-using UnityEngine;
 using Cysharp.Threading.Tasks;
-using R3;
 using HolyHell.Battle;
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
+using R3;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Main battle UI controller - manages all battle UI components
@@ -33,6 +34,16 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     private CompositeDisposable disposables = new CompositeDisposable();
     private bool isComponentsInitialized = false;
 
+    private void OnEnable()
+    {
+        InputManager.Instance.PushActionMap("Battle");
+    }
+
+    private void OnDisable()
+    {
+        InputManager.Instance.PopActionMap("Battle");
+    }
+
     public async UniTask Init()
     {
         // Get BattleManager reference
@@ -51,6 +62,8 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         {
             OnBattleStateChanged(state);
         }).AddTo(disposables);
+
+        InputSystem.actions.FindActionMap("Battle").FindAction("CloseCardPreview").canceled += Input_CloseCardPreview;
     }
 
     /// <summary>
@@ -197,6 +210,12 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         {
             targetSelector.OnTargetSelected(enemy);
         }
+    }
+
+    private void Input_CloseCardPreview(InputAction.CallbackContext ctx)
+    {
+        //TODO
+        Debug.Log("release left button");
     }
 
     /// <summary>
