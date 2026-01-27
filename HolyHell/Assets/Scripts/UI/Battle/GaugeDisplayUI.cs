@@ -94,6 +94,15 @@ public class GaugeDisplayUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clean up subscriptions
+    /// </summary>
+    public void Cleanup()
+    {
+        disposables.Clear();
+        Debug.Log("GaugeDisplayUI cleaned up");
+    }
+
     private void OnDestroy()
     {
         disposables.Dispose();

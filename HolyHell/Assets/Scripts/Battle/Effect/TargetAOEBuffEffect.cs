@@ -13,19 +13,19 @@ namespace HolyHell.Battle.Effect
 
         public override bool Execute(EffectContext context)
         {
-            string buffId = EffectValueParser.ParseBuffId(Value);
+            var buffDef = EffectValueParser.ParseBuffDefinition(Value);
 
             var targets = context.GetAliveEnemies();
             foreach (var enemy in targets)
             {
-                var buff = BuffFactory.CreateBuffFromId(buffId);
+                var buff = BuffFactory.CreateBuffFromId(buffDef.Id, buffDef.Parameter, buffDef.StackCount, buffDef.Duration);
                 if (buff != null)
                 {
                     enemy.buffHandler.AddBuff(buff);
                 }
             }
 
-            Debug.Log($"Applied {buffId} buff to all enemies");
+            Debug.Log($"Applied {buffDef.Id} buff to all enemies");
             return false;
         }
 

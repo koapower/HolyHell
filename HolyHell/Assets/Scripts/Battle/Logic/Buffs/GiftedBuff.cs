@@ -27,7 +27,7 @@ namespace HolyHell.Battle.Logic.Buffs
 
         public int GetCardsToGenerate()
         {
-            return StackCount; // 1 card per stack
+            return StackCount.Value; // 1 card per stack
         }
     }
 }

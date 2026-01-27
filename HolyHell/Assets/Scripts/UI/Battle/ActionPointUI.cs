@@ -110,8 +110,26 @@ public class ActionPointUI : MonoBehaviour
     {
         if (actionPointText != null)
         {
-            actionPointText.text = $"Energy: {current} / {max}";
+            actionPointText.text = $"{current}";
         }
+    }
+
+    /// <summary>
+    /// Clean up subscriptions and icon instances
+    /// </summary>
+    public void Cleanup()
+    {
+        disposables.Clear();
+
+        // Clear icon instances
+        foreach (var icon in actionPointIcons)
+        {
+            if (icon != null)
+                Destroy(icon.gameObject);
+        }
+        actionPointIcons.Clear();
+
+        Debug.Log("ActionPointUI cleaned up");
     }
 
     private void OnDestroy()

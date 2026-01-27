@@ -58,6 +58,12 @@ public class TurnIndicatorUI : MonoBehaviour
         }
     }
 
+    public void Cleanup()
+    {
+        disposables.Clear();
+        Debug.Log("TurnIndicatorUI cleaned up");
+    }
+
     private void OnDestroy()
     {
         disposables.Dispose();

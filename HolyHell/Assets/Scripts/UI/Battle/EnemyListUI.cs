@@ -16,6 +16,8 @@ public class EnemyListUI : MonoBehaviour
 
     public void Initialize(List<EnemyEntity> enemies, Action<EnemyEntity> onEnemyClick)
     {
+        enemyUIPrefab.SetActive(false);
+
         onEnemyClickCallback = onEnemyClick;
 
         if (enemies == null || enemies.Count == 0)
@@ -45,6 +47,7 @@ public class EnemyListUI : MonoBehaviour
         }
 
         var enemyUIObj = Instantiate(enemyUIPrefab, enemyContainer);
+        enemyUIObj.SetActive(true);
         var enemyUI = enemyUIObj.GetComponent<EnemyUI>();
 
         if (enemyUI != null)
@@ -99,6 +102,13 @@ public class EnemyListUI : MonoBehaviour
             }
         }
         enemyUIList.Clear();
+    }
+
+    public void Cleanup()
+    {
+        ClearEnemyUI();
+        onEnemyClickCallback = null;
+        Debug.Log("EnemyListUI cleaned up");
     }
 
     private void OnDestroy()

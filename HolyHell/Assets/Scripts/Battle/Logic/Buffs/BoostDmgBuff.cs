@@ -20,7 +20,7 @@ namespace HolyHell.Battle.Logic.Buffs
 
         public override float OnCalculateDamage(float currentDamage)
         {
-            return currentDamage + (flatDamageBoost * StackCount);
+            return currentDamage + (flatDamageBoost * StackCount.Value);
         }
     }
 }

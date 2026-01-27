@@ -39,7 +39,7 @@ public class DeckCounterUI : MonoBehaviour
         if (drawPileText != null)
         {
             int drawCount = player.drawPile?.Count ?? 0;
-            drawPileText.text = $"Draw: {drawCount}";
+            drawPileText.text = $"{drawCount}";
         }
 
         // Discard pile count
@@ -55,5 +55,11 @@ public class DeckCounterUI : MonoBehaviour
             int handCount = player.hand?.Count ?? 0;
             handCountText.text = $"Hand: {handCount}";
         }
+    }
+
+    public void Cleanup()
+    {
+        player = null;
+        Debug.Log("DeckCounterUI cleaned up");
     }
 }

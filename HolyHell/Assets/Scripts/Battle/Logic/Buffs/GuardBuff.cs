@@ -21,7 +21,7 @@ namespace HolyHell.Battle.Logic.Buffs
             if (incomingDamage > 0)
             {
                 // Buff will be removed after blocking (set duration to 0)
-                Duration = 0;
+                Duration.Value = 0;
                 return 0f; // No damage taken
             }
 

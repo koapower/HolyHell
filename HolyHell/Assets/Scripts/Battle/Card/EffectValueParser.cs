@@ -120,12 +120,19 @@ namespace HolyHell.Battle.Card
         /// </summary>
         /// <param name="value">String value to parse</param>
         /// <returns>Trimmed buff ID string</returns>
-        public static string ParseBuffId(string value)
+        public static BuffDefinition ParseBuffDefinition(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                return string.Empty;
+                return default;
 
-            return value.Trim();
+            var split = value.Split(',', System.StringSplitOptions.RemoveEmptyEntries);
+            var index = 0;
+            var buffId = split[index++].Trim();
+            var parameter = split.Length > index ? split[index++].Trim() : string.Empty;
+            var stack = split.Length > index ? ParseInt(split[index++].Trim()) : 0;
+            var duration = split.Length > index ? ParseInt(split[index++].Trim()) : 0;
+
+            return new BuffDefinition(buffId, parameter, stack, duration);
         }
     }
 }

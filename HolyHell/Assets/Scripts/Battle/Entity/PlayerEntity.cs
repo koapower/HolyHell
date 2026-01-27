@@ -3,6 +3,7 @@ using R3;
 using System.Collections.Generic;
 using HolyHell.Battle.Card;
 using UnityEngine;
+using ObservableCollections;
 
 namespace HolyHell.Battle.Entity
 {
@@ -17,9 +18,9 @@ namespace HolyHell.Battle.Entity
         public ReactiveProperty<int> maxActionPoint = new ReactiveProperty<int>(3);
 
         // Deck management
-        public List<CardInstance> drawPile = new List<CardInstance>();
-        public List<CardInstance> hand = new List<CardInstance>();
-        public List<CardInstance> discardPile = new List<CardInstance>();
+        public ObservableList<CardInstance> drawPile = new ObservableList<CardInstance>();
+        public ObservableList<CardInstance> hand = new ObservableList<CardInstance>();
+        public ObservableList<CardInstance> discardPile = new ObservableList<CardInstance>();
 
         // Deck manager reference
         public DeckManager deckManager;

@@ -2,5 +2,5 @@ ID,DisplayName,Type,Faction,Godhood,AvalueInc,DvalueInc,Rarity,ActionCost,Effect
 AngelBasic,Holy Wrath,Bliss,Angel,Intereon,10,-10,1,1,SingleDamage,10,,SingleDamage,10,Ametervalue>=25,,,,,,,,,"Deals 10 {icon:Bliss} damage.
 Deals 20 when {icon:Angelmeter} >= 25% instead."
 NeutAttack,Soul Arrow,Enlightened,Neutral,,,,1,1,SingleDamage,4,,,,,,,,,,,,,Deals 4 {icon:type} damage.
-NeutDefence,Soul Barrier,Domination,Neutral,,,,1,1,SelfBuff,Guard,,,,,,,,,,,,,Gain {keyword:Guard}
+NeutDefence,Soul Barrier,Domination,Neutral,,,,1,1,SelfBuff,"Guard,1",,,,,,,,,,,,,Gain {keyword:Guard}
 NeutAttack2,Soul Barrage,Domination,Neutral,,,,2,2,SingleDamage,8,,AOEDamage,8,,,,,,,,,,"Deals 16 {icon:Domination} damage to one target, and 8 to others."

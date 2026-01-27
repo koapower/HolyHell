@@ -9,8 +9,10 @@ public class TableManager : ITableManager
 
     public async UniTask Init()
     {
-        Register(new Table<CardRow>(), new[] { "Res:/Tables/Card.csv" });
         //Register(new Table<DialogueNodeRow>(), new[] { "Res:/Tables/DialogueNodes.csv", "Res:/Tables/DialogueNodes2.csv" });
+        Register(new Table<CardRow>(), new[] { "Res:/Tables/Card.csv" });
+        Register(new Table<MonsterSkillRow>(), new[] { "Res:/Tables/MonsterSkill.csv" });
+        Register(new Table<EnemyRow>(), new[] { "Res:/Tables/Enemy.csv" });
 
         await UniTask.CompletedTask;
     }

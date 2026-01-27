@@ -56,6 +56,18 @@ public class EndTurnButton : MonoBehaviour
         button.interactable = (phase == TurnPhase.PlayerTurn);
     }
 
+    public void Cleanup()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnButtonClicked);
+        }
+
+        disposables.Clear();
+        battleManager = null;
+        Debug.Log("EndTurnButton cleaned up");
+    }
+
     private void OnDestroy()
     {
         if (button != null)

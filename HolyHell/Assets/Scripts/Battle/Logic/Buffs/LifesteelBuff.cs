@@ -23,7 +23,7 @@ namespace HolyHell.Battle.Logic.Buffs
         public void TriggerLifesteal()
         {
             HasTriggered = true;
-            Duration = 0; // Remove buff after trigger
+            Duration.Value = 0; // Remove buff after trigger
         }
     }
 }

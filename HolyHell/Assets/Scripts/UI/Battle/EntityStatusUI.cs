@@ -17,6 +17,9 @@ public class EntityStatusUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI shieldText;
     [SerializeField] private GameObject shieldIcon;
 
+    [Header("Buff Display")]
+    [SerializeField] private Transform buffContainer;
+
     private CompositeDisposable disposables = new CompositeDisposable();
 
     public void Initialize(BattleEntity entity)
@@ -72,6 +75,15 @@ public class EntityStatusUI : MonoBehaviour
         {
             shieldIcon.SetActive(shield > 0);
         }
+    }
+
+    /// <summary>
+    /// Clean up subscriptions
+    /// </summary>
+    public void Cleanup()
+    {
+        disposables.Clear();
+        Debug.Log("EntityStatusUI cleaned up");
     }
 
     private void OnDestroy()

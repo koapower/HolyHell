@@ -1,8 +1,12 @@
-using UnityEngine;
+using Cysharp.Threading.Tasks;
+using HolyHell.Battle.Card;
+using HolyHell.Battle.Entity;
+using ObservableCollections;
+using R3;
 using System;
 using System.Collections.Generic;
-using HolyHell.Battle.Entity;
-using HolyHell.Battle.Card;
+using System.Collections.Specialized;
+using UnityEngine;
 
 /// <summary>
 /// Displays and manages player's hand of cards
@@ -11,17 +15,19 @@ public class HandUI : MonoBehaviour
 {
     [SerializeField] private FanLayoutGroup fanLayoutGroup;
     [SerializeField] private Transform cardContainer;
-    [SerializeField] private GameObject cardUIPrefab;
+    [SerializeField] private CardSlotUI cardSlotPrefab;
 
     private PlayerEntity player;
     private Action<CardInstance> onCardClickCallback;
+    private List<CardSlotUI> cardSlotUIList = new List<CardSlotUI>();
     private List<CardUI> cardUIList = new List<CardUI>();
-
-    // Polling for hand changes (simple approach)
-    private int lastHandCount = 0;
+    private ISynchronizedView<CardInstance, GameObject> view;
+    private bool _isLayoutDirty = false;
 
     public void Initialize(PlayerEntity playerEntity, Action<CardInstance> onCardClick)
     {
+        cardSlotPrefab.gameObject.SetActive(false);
+
         player = playerEntity;
         onCardClickCallback = onCardClick;
 
@@ -31,25 +37,50 @@ public class HandUI : MonoBehaviour
             return;
         }
 
-        RebuildHand();
+        view = player.hand.CreateView(card =>
+        {
+            var slotObj = CreateCardSlotUI(card);
+            return slotObj.gameObject;
+        }).AddTo(this);
+        view.ViewChanged += View_ViewChanged;
+
+        //RebuildHand();
         Debug.Log("HandUI initialized");
     }
 
-    private void Update()
+    void View_ViewChanged(in SynchronizedViewChangedEventArgs<CardInstance, GameObject> eventArgs)
     {
-        // Simple polling to detect hand changes
-        // TODO use events or ReactiveCollection
-        if (player != null && player.hand.Count != lastHandCount)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
-            lastHandCount = player.hand.Count;
-            RebuildHand();
-            fanLayoutGroup.LayoutCards();
+            var slot = eventArgs.OldItem.View.GetComponent<CardSlotUI>();
+            if (slot != null)
+                DestroyCardSlotUI(slot);
+        }
+        else if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
+        {
+            ClearHand();
         }
 
-        // Update playability based on action points
         if (player != null)
         {
             UpdateCardPlayability();
+            _isLayoutDirty = true;
+            UpdateLayoutAsync().Forget();
+        }
+    }
+
+    private async UniTaskVoid UpdateLayoutAsync()
+    {
+        try
+        {
+            await UniTask.Yield(PlayerLoopTiming.Update);
+            if (_isLayoutDirty && fanLayoutGroup != null)
+                fanLayoutGroup.LayoutCards();
+        }
+        finally
+        {
+            // set it back to false regradless of success or failure
+            _isLayoutDirty = false;
         }
     }
 
@@ -64,32 +95,42 @@ public class HandUI : MonoBehaviour
 
         foreach (var card in player.hand)
         {
-            CreateCardUI(card);
+            CreateCardSlotUI(card);
         }
 
         Debug.Log($"HandUI rebuilt with {player.hand.Count} cards");
     }
 
-    private void CreateCardUI(CardInstance card)
+    private CardSlotUI CreateCardSlotUI(CardInstance card)
     {
-        if (cardUIPrefab == null || cardContainer == null)
+        if (cardSlotPrefab == null || cardContainer == null || cardSlotPrefab.cardUI == null)
         {
-            Debug.LogError("HandUI: Prefab or container is null!");
-            return;
+            Debug.LogError("HandUI: Prefab or container or cardUI is null!");
+            return null;
         }
 
-        var cardUIObj = Instantiate(cardUIPrefab, cardContainer);
-        var cardUI = cardUIObj.GetComponent<CardUI>();
+        var cardSlotUIObj = Instantiate(cardSlotPrefab, cardContainer);
+        cardSlotUIObj.gameObject.SetActive(true);
 
-        if (cardUI != null)
+        if (cardSlotUIObj != null)
         {
-            cardUI.Initialize(card, OnCardClicked);
-            cardUIList.Add(cardUI);
+            cardSlotUIObj.cardUI.Initialize(card, OnCardClicked);
+            cardSlotUIList.Add(cardSlotUIObj);
+            cardUIList.Add(cardSlotUIObj.cardUI);
         }
         else
         {
             Debug.LogError("HandUI: CardUI component not found on prefab!");
         }
+
+        return cardSlotUIObj;
+    }
+
+    private void DestroyCardSlotUI(CardSlotUI slot)
+    {
+        cardSlotUIList.Remove(slot);
+        cardUIList.Remove(slot.cardUI);
+        Destroy(slot.gameObject);
     }
 
     private void OnCardClicked(CardInstance card)
@@ -119,18 +160,32 @@ public class HandUI : MonoBehaviour
 
     private void ClearHand()
     {
-        foreach (var cardUI in cardUIList)
+        // cardUI is a child of cardSlotUI, so destroying cardSlotUI is sufficient
+        cardUIList.Clear();
+        foreach (var cardSlotUI in cardSlotUIList)
         {
-            if (cardUI != null)
+            if (cardSlotUI != null)
             {
-                Destroy(cardUI.gameObject);
+                Destroy(cardSlotUI.gameObject);
             }
         }
-        cardUIList.Clear();
+        cardSlotUIList.Clear();
+    }
+
+    /// <summary>
+    /// Clean up hand UI
+    /// </summary>
+    public void Cleanup()
+    {
+        ClearHand();
+        player = null;
+        onCardClickCallback = null;
+        Debug.Log("HandUI cleaned up");
     }
 
     private void OnDestroy()
     {
         ClearHand();
+        view?.Dispose();
     }
 }

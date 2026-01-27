@@ -47,6 +47,9 @@ namespace HolyHell.Battle
         {
             Debug.Log("===== BATTLE START =====");
 
+            // Clean up previous battle if any
+            CleanupBattle();
+
             battleState.Value = BattleState.Initializing;
 
             // Initialize player
@@ -71,6 +74,16 @@ namespace HolyHell.Battle
 
             // Start first turn
             turnSystem.StartPlayerTurn();
+        }
+
+        /// <summary>
+        /// Stop the current battle (forced end)
+        /// </summary>
+        public void StopBattle()
+        {
+            Debug.Log("===== BATTLE STOPPED =====");
+            battleState.Value = BattleState.Ended;
+            CleanupBattle();
         }
 
         /// <summary>
@@ -243,6 +256,9 @@ namespace HolyHell.Battle
             {
                 Debug.Log("===== DEFEAT! =====");
             }
+
+            // Clean up after battle ends
+            CleanupBattle();
         }
 
         /// <summary>
@@ -268,20 +284,19 @@ namespace HolyHell.Battle
         }
 
         /// <summary>
-        /// Clean up battle resources
+        /// Clean up current battle (entities and systems)
+        /// Called before starting a new battle or when battle ends
         /// </summary>
-        public void Dispose()
+        private void CleanupBattle()
         {
-            Debug.Log("BattleManager disposing...");
-
-            // Dispose ReactiveProperties
-            battleState?.Dispose();
+            Debug.Log("BattleManager cleaning up battle...");
 
             // Dispose TurnSystem ReactiveProperties
             if (turnSystem != null)
             {
                 turnSystem.currentPhase?.Dispose();
                 turnSystem.turnNumber?.Dispose();
+                turnSystem = null;
             }
 
             // Destroy player GameObject (OnDestroy will handle ReactiveProperty disposal)
@@ -302,8 +317,24 @@ namespace HolyHell.Battle
             enemies.Clear();
 
             // Clear systems
-            turnSystem = null;
             cardEffectExecutor = null;
+
+            Debug.Log("BattleManager battle cleanup complete");
+        }
+
+        /// <summary>
+        /// Clean up battle resources (called by ServiceLocator on shutdown)
+        /// </summary>
+        public void Dispose()
+        {
+            Debug.Log("BattleManager disposing...");
+
+            // Clean up current battle
+            CleanupBattle();
+
+            // Dispose ReactiveProperties
+            battleState?.Dispose();
+            battleState = null;
 
             Debug.Log("BattleManager disposed");
         }

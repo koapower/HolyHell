@@ -156,6 +156,24 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         UpdateVisual();
     }
 
+    /// <summary>
+    /// Clean up subscriptions and reset state
+    /// </summary>
+    public void Cleanup()
+    {
+        disposables.Clear();
+
+        if (statusUI != null)
+            statusUI.Cleanup();
+
+        enemy = null;
+        onClickCallback = null;
+        isTargetable = false;
+        isDead = false;
+
+        Debug.Log("EnemyUI cleaned up");
+    }
+
     private void OnDestroy()
     {
         disposables.Dispose();

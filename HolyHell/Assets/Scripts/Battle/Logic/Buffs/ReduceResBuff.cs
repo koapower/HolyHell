@@ -23,7 +23,7 @@ namespace HolyHell.Battle.Logic.Buffs
         public float GetResistanceModifier()
         {
             // Returns resistance increase multiplier (e.g., 0.1 = 10% more damage per stack)
-            return resistanceReduction / 100f * StackCount;
+            return resistanceReduction / 100f * StackCount.Value;
         }
     }
 }

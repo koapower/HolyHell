@@ -21,7 +21,7 @@ namespace HolyHell.Battle.Logic.Buffs
         public override float OnReceiveDamage(float incomingDamage)
         {
             // Increase damage taken by percentage per stack
-            return incomingDamage * (1f + (damageIncreasePercentage / 100f) * StackCount);
+            return incomingDamage * (1f + (damageIncreasePercentage / 100f) * StackCount.Value);
         }
     }
 }

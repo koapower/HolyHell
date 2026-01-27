@@ -1,2 +1,2 @@
-ID,DisplayName,Type,Effect1,EffectAtr1,Effect2,EffectAtr2,Condition2,ConditionAtr2,VFX
-,Sunlight Ray,Bliss,SingleDamage,0.3
+ID,DisplayName,Type,Effect1,EffectAtr1,Effect2,EffectAtr2,Effect3,EffectAtr3,VFX,SkillDes
+SunlightRay,Sunlight Ray,Bliss,SingleDamage,0.3

@@ -1,7 +1,8 @@
-using UnityEngine;
 using HolyHell.Battle;
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Handles target selection for cards
@@ -14,11 +15,17 @@ public class TargetSelector : MonoBehaviour
     private CardInstance currentCard;
     private bool isSelectingTarget = false;
 
+    private InputAction cancelAction; //TODO set it in input map instead, this is just for testing
+
     public void Initialize(BattleManager manager, EnemyListUI enemyList)
     {
         battleManager = manager;
         enemyListUI = enemyList;
 
+        cancelAction = new InputAction("TempCancel", binding: "<Keyboard>/escape");
+        cancelAction.AddBinding("<Mouse>/rightButton");
+        cancelAction.performed += _ => { if (isSelectingTarget) CancelTargetSelection(); };
+        cancelAction.Enable();
         Debug.Log("TargetSelector initialized");
     }
 
@@ -107,15 +114,25 @@ public class TargetSelector : MonoBehaviour
         }
     }
 
-    private void Update()
+    //private void Update()
+    //{
+    //    // Cancel target selection on right click or ESC
+    //    if (isSelectingTarget)
+    //    {
+    //        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+    //        {
+    //            CancelTargetSelection();
+    //        }
+    //    }
+    //}
+
+    public void Cleanup()
     {
-        // Cancel target selection on right click or ESC
-        if (isSelectingTarget)
-        {
-            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
-            {
-                CancelTargetSelection();
-            }
-        }
+        EndTargetSelection();
+        battleManager = null;
+        enemyListUI = null;
+        cancelAction.Dispose();
+        cancelAction = null;
+        Debug.Log("TargetSelector cleaned up");
     }
 }

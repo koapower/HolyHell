@@ -21,7 +21,7 @@ namespace HolyHell.Battle.Logic.Buffs
         public override float OnCalculateDamage(float currentDamage)
         {
             // Reduce damage dealt by percentage per stack
-            return currentDamage * (1f - (attackReductionPercentage / 100f) * StackCount);
+            return currentDamage * (1f - (attackReductionPercentage / 100f) * StackCount.Value);
         }
     }
 }

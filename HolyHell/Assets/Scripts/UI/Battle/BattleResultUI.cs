@@ -150,6 +150,17 @@ public class BattleResultUI : MonoBehaviour
         }
     }
 
+    public void Cleanup()
+    {
+        if (continueButton != null)
+        {
+            continueButton.onClick.RemoveListener(OnContinueClicked);
+        }
+
+        disposables.Clear();
+        Debug.Log("BattleResultUI cleaned up");
+    }
+
     private void OnDestroy()
     {
         if (continueButton != null)

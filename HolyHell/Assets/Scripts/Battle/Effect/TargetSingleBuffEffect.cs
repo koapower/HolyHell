@@ -19,17 +19,17 @@ namespace HolyHell.Battle.Effect
                 return false;
             }
 
-            string buffId = EffectValueParser.ParseBuffId(Value);
-            var buff = BuffFactory.CreateBuffFromId(buffId);
+            var buffDef = EffectValueParser.ParseBuffDefinition(Value);
+            var buff = BuffFactory.CreateBuffFromId(buffDef.Id, buffDef.Parameter, buffDef.StackCount, buffDef.Duration);
 
             if (buff != null)
             {
                 context.Target.buffHandler.AddBuff(buff);
-                Debug.Log($"Applied {buffId} buff to target");
+                Debug.Log($"Applied {buff.Id} buff to target");
             }
             else
             {
-                Debug.LogWarning($"Failed to create buff: {buffId}");
+                Debug.LogWarning($"Failed to create buff: {buff.Id}");
             }
 
             return false;
