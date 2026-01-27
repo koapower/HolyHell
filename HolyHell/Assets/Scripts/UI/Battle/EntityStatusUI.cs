@@ -1,8 +1,8 @@
+using HolyHell.Battle.Entity;
+using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using R3;
-using HolyHell.Battle.Entity;
 
 /// <summary>
 /// Displays entity HP and shield
@@ -16,10 +16,6 @@ public class EntityStatusUI : MonoBehaviour
     [Header("Shield Display")]
     [SerializeField] private TextMeshProUGUI shieldText;
     [SerializeField] private GameObject shieldIcon;
-
-    [Header("Buff Display")]
-    [SerializeField] private Transform buffContainer;
-
     private CompositeDisposable disposables = new CompositeDisposable();
 
     public void Initialize(BattleEntity entity)

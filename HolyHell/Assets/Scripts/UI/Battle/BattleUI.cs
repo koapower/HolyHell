@@ -12,6 +12,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 {
     [Header("Player UI")]
     [SerializeField] private EntityStatusUI playerStatusUI;
+    [SerializeField] private BuffView playerBuffView;
     [SerializeField] private GaugeDisplayUI gaugeDisplayUI;
     [SerializeField] private ActionPointUI actionPointUI;
     [SerializeField] private HandUI handUI;
@@ -90,6 +91,9 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         // Initialize player UI
         if (playerStatusUI != null && battleManager.player != null)
             playerStatusUI.Initialize(battleManager.player);
+
+        if (playerBuffView != null && battleManager.player != null)
+            playerBuffView.Initialize(battleManager.player);
 
         if (gaugeDisplayUI != null && battleManager.player != null)
             gaugeDisplayUI.Initialize(battleManager.player);

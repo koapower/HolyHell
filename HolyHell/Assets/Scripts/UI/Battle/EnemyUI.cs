@@ -15,8 +15,9 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     [Header("Enemy Info")]
     [SerializeField] private TextMeshProUGUI nameText;
 
-    [Header("HP&Shield Display")]
+    [Header("Status Display")]
     [SerializeField] private EntityStatusUI statusUI;
+    [SerializeField] private BuffView buffView;
 
     [Header("Intent Display")]
     [SerializeField] private TextMeshProUGUI intentText;
@@ -53,6 +54,7 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         }
 
         statusUI.Initialize(enemy);
+        buffView.Initialize(enemy);
 
         // Subscribe to intent changes
         enemy.currentIntent.Subscribe(intent =>

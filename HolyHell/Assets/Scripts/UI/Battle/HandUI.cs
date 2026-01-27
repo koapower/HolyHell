@@ -50,15 +50,24 @@ public class HandUI : MonoBehaviour
 
     void View_ViewChanged(in SynchronizedViewChangedEventArgs<CardInstance, GameObject> eventArgs)
     {
-        if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
+        switch (eventArgs.Action)
         {
-            var slot = eventArgs.OldItem.View.GetComponent<CardSlotUI>();
-            if (slot != null)
-                DestroyCardSlotUI(slot);
-        }
-        else if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
-        {
-            ClearHand();
+            case NotifyCollectionChangedAction.Add:
+                break;
+            case NotifyCollectionChangedAction.Move:
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                var slot = eventArgs.OldItem.View.GetComponent<CardSlotUI>();
+                if (slot != null)
+                    DestroyCardSlotUI(slot);
+                break;
+            case NotifyCollectionChangedAction.Replace:
+                break;
+            case NotifyCollectionChangedAction.Reset:
+                ClearHand();
+                break;
+            default:
+                break;
         }
 
         if (player != null)

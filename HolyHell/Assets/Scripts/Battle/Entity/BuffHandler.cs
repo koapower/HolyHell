@@ -42,12 +42,10 @@ namespace HolyHell.Battle.Entity
                     existingBuff.StackCount.Value += buff.StackCount.Value;
                     Debug.Log($"Buff {buff.Id} stacked to {existingBuff.StackCount}");
                 }
-                else
-                {
-                    // Non-stackable: refresh duration instead
-                    existingBuff.Duration = buff.Duration;
-                    Debug.Log($"Buff {buff.Id} duration refreshed to {buff.Duration}");
-                }
+
+                // refresh duration
+                existingBuff.Duration.Value = buff.Duration.Value;
+                Debug.Log($"Buff {buff.Id} duration refreshed to {buff.Duration}");
             }
             else
             {
