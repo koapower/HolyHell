@@ -667,8 +667,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190325
-  m_fontColor: {r: 0.9622642, g: 0, b: 0, a: 1}
+    rgba: 4294173524
+  m_fontColor: {r: 0.32809716, g: 0.8887763, b: 0.9528302, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -783,6 +783,12 @@ MonoBehaviour:
   cardNameText: {fileID: 4625282206502451253}
   costText: {fileID: 703358017338443323}
   descriptionText: {fileID: 8611052331255544692}
+  elementImage: {fileID: 7287961315592652051}
+  blissColor: {r: 0.627451, g: 0.1254902, b: 0.9411765, a: 1}
+  dominationColor: {r: 1, g: 0, b: 0, a: 1}
+  enlightendColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  despairColor: {r: 0, g: 1, b: 1, a: 1}
+  ravenousColor: {r: 0, g: 1, b: 0, a: 1}
   angelGaugeText: {fileID: 2523422579619878443}
   demonGaugeText: {fileID: 8028267352169045584}
   backgroundImage: {fileID: 4291522005754127816}

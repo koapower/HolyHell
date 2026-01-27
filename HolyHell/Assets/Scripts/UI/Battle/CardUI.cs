@@ -9,12 +9,18 @@ using HolyHell.Battle.Card;
 /// Displays a single card in hand
 /// Handles click and hover events
 /// </summary>
-public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Card Info")]
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private TextMeshProUGUI costText;
     [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private Image elementImage;
+    [SerializeField] private Color blissColor = Color.purple;
+    [SerializeField] private Color dominationColor = Color.red;
+    [SerializeField] private Color enlightendColor = Color.yellow;
+    [SerializeField] private Color despairColor = Color.cyan;
+    [SerializeField] private Color ravenousColor = Color.green;
 
     [Header("Gauge Display")]
     [SerializeField] private TextMeshProUGUI angelGaugeText;
@@ -74,6 +80,20 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (descriptionText != null)
         {
             descriptionText.text = card.cardData.Description;
+        }
+
+        // Element
+        if (elementImage != null)
+        {
+            elementImage.color = card.cardData.ElementType switch
+            {
+                ElementType.Bliss => blissColor,
+                ElementType.Domination => dominationColor,
+                ElementType.Enlightened => enlightendColor,
+                ElementType.Despair => despairColor,
+                ElementType.Ravenous => ravenousColor,
+                _ => Color.white
+            };
         }
 
         // Gauge changes
@@ -180,5 +200,17 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         isHovered = false;
         UpdateVisual();
+    }
+
+    // IPointerUpHandler
+    public void OnPointerUp(PointerEventData eventData)
+    {
+
+    }
+
+    // IPointerDownHandler
+    public void OnPointerDown(PointerEventData eventData)
+    {
+
     }
 }
