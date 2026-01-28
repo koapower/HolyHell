@@ -32,6 +32,8 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     [SerializeField] private TargetSelector targetSelector;
 
     private BattleManager battleManager;
+    private InputAction cancelAction;
+    private InputAction closeCardPreviewAction;
     private CompositeDisposable disposables = new CompositeDisposable();
     private bool isComponentsInitialized = false;
 
@@ -64,7 +66,11 @@ public class BattleUI : MonoBehaviour, IUIInitializable
             OnBattleStateChanged(state);
         }).AddTo(disposables);
 
-        InputSystem.actions.FindActionMap("Battle").FindAction("CloseCardPreview").canceled += Input_CloseCardPreview;
+        var inputMap = InputSystem.actions.FindActionMap("Battle");
+        cancelAction = inputMap.FindAction("Cancel");
+        cancelAction.performed += targetSelector.Input_Cancel;
+        closeCardPreviewAction = inputMap.FindAction("CloseCardPreview");
+        closeCardPreviewAction.canceled += Input_CloseCardPreview;
     }
 
     /// <summary>
@@ -227,6 +233,10 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     private void OnDestroy()
     {
         CleanupComponents();
+        cancelAction.Dispose();
+        cancelAction = null;
+        closeCardPreviewAction.Dispose();
+        closeCardPreviewAction = null;
         disposables.Dispose();
         Debug.Log("BattleUI destroyed");
     }
