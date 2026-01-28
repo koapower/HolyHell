@@ -17,6 +17,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private TextMeshProUGUI costText;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Image elementImage;
+    [SerializeField] private Color angelColor = new Color(1f, 0.9f, 0.5f); // Light gold
+    [SerializeField] private Color demonColor = new Color(0.6f, 0.2f, 0.8f); // Dark purple]
     [SerializeField] private Color blissColor = Color.purple;
     [SerializeField] private Color dominationColor = Color.red;
     [SerializeField] private Color enlightendColor = Color.yellow;
@@ -74,6 +76,12 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (cardNameText != null)
         {
             cardNameText.text = card.DisplayName;
+            cardNameText.color = card.cardData.Faction switch
+            {
+                Faction.Angel => angelColor,
+                Faction.Demon => demonColor,
+                _ => Color.white
+            };
         }
 
         // Cost
