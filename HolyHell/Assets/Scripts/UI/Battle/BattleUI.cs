@@ -18,6 +18,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     [SerializeField] private ActionPointUI actionPointUI;
     [SerializeField] private HandUI handUI;
     [SerializeField] private DeckCounterUI deckCounterUI;
+    [SerializeField] private CardPreviewUI cardPreviewUI;
 
     [Header("Enemy UI")]
     [SerializeField] private EnemyListUI enemyListUI;
@@ -115,10 +116,13 @@ public class BattleUI : MonoBehaviour, IUIInitializable
             actionPointUI.Initialize(battleManager.player);
 
         if (handUI != null && battleManager.player != null)
-            handUI.Initialize(battleManager.player, OnCardClicked);
+            handUI.Initialize(battleManager, battleManager.player, OnCardClicked);
 
         if (deckCounterUI != null && battleManager.player != null)
             deckCounterUI.Initialize(battleManager.player);
+
+        if (cardPreviewUI != null)
+            cardPreviewUI.Initialize(battleManager);
 
         // Initialize enemy UI
         if (enemyListUI != null && battleManager.enemies != null)
@@ -214,8 +218,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     private void Input_CloseCardPreview(InputAction.CallbackContext ctx)
     {
-        //TODO
-        Debug.Log("release left button");
+        battleManager.currentPreviewCard.Value = null;
     }
 
     /// <summary>

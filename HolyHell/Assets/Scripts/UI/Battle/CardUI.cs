@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System;
 using HolyHell.Battle.Card;
+using HolyHell.Battle;
 
 /// <summary>
 /// Displays a single card in hand
@@ -23,6 +24,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Color ravenousColor = Color.green;
 
     [Header("Gauge Display")]
+    [SerializeField] private Image angelBg;
+    [SerializeField] private Image demonBg;
     [SerializeField] private TextMeshProUGUI angelGaugeText;
     [SerializeField] private TextMeshProUGUI demonGaugeText;
 
@@ -34,9 +37,11 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Color unplayableColor = Color.gray;
 
     [Header("Hover Effect")]
+    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private float hoverScale = 1.1f;
     [SerializeField] private float hoverTransitionSpeed = 10f;
 
+    private BattleManager battleManager;
     private CardInstance card;
     private Action<CardInstance> onClickCallback;
     private bool isPlayable = true;
@@ -48,8 +53,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         originalScale = transform.localScale;
     }
 
-    public void Initialize(CardInstance cardInstance, Action<CardInstance> onClick)
+    public void Initialize(BattleManager battleManager, CardInstance cardInstance, Action<CardInstance> onClick)
     {
+        this.battleManager = battleManager;
         card = cardInstance;
         onClickCallback = onClick;
 
@@ -102,8 +108,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             if (card.AngelGaugeIncrease != 0)
             {
                 angelGaugeText.text = card.AngelGaugeIncrease > 0
-                    ? $"+{card.AngelGaugeIncrease} Light"
-                    : $"{card.AngelGaugeIncrease} Light";
+                    ? $"+{card.AngelGaugeIncrease}"
+                    : $"{card.AngelGaugeIncrease}";
             }
             else
             {
@@ -116,13 +122,23 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             if (card.DemonGaugeIncrease != 0)
             {
                 demonGaugeText.text = card.DemonGaugeIncrease > 0
-                    ? $"+{card.DemonGaugeIncrease} Dark"
-                    : $"{card.DemonGaugeIncrease} Dark";
+                    ? $"+{card.DemonGaugeIncrease}"
+                    : $"{card.DemonGaugeIncrease}";
             }
             else
             {
                 demonGaugeText.text = "";
             }
+        }
+
+        if(angelBg != null)
+        {
+            angelBg.gameObject.SetActive(card.AngelGaugeIncrease != 0);
+        }
+
+        if (demonBg != null)
+        {
+            demonBg.gameObject.SetActive(card.DemonGaugeIncrease != 0);
         }
 
         // Set card frame color based on faction
@@ -149,6 +165,13 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         isPlayable = playable;
         UpdateVisual();
+    }
+
+    public void SetCardInteractability(bool canInteract)
+    {
+        // default is true
+        canvasGroup.blocksRaycasts = canInteract;
+        canvasGroup.interactable = canInteract;
     }
 
     private void UpdateVisual()
@@ -211,6 +234,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
-
+        Debug.Log($"ponterdown {card.DisplayName}");
+        battleManager.currentPreviewCard.Value = card;
     }
 }

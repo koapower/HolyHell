@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using HolyHell.Battle;
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
 using ObservableCollections;
@@ -17,6 +18,7 @@ public class HandUI : MonoBehaviour
     [SerializeField] private Transform cardContainer;
     [SerializeField] private CardSlotUI cardSlotPrefab;
 
+    private BattleManager battleManager;
     private PlayerEntity player;
     private Action<CardInstance> onCardClickCallback;
     private List<CardSlotUI> cardSlotUIList = new List<CardSlotUI>();
@@ -24,10 +26,11 @@ public class HandUI : MonoBehaviour
     private ISynchronizedView<CardInstance, GameObject> view;
     private bool _isLayoutDirty = false;
 
-    public void Initialize(PlayerEntity playerEntity, Action<CardInstance> onCardClick)
+    public void Initialize(BattleManager battleManager, PlayerEntity playerEntity, Action<CardInstance> onCardClick)
     {
         cardSlotPrefab.gameObject.SetActive(false);
 
+        this.battleManager = battleManager;
         player = playerEntity;
         onCardClickCallback = onCardClick;
 
@@ -123,7 +126,7 @@ public class HandUI : MonoBehaviour
 
         if (cardSlotUIObj != null)
         {
-            cardSlotUIObj.cardUI.Initialize(card, OnCardClicked);
+            cardSlotUIObj.cardUI.Initialize(battleManager, card, OnCardClicked);
             cardSlotUIList.Add(cardSlotUIObj);
             cardUIList.Add(cardSlotUIObj.cardUI);
         }
