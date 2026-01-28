@@ -5,6 +5,7 @@ using TMPro;
 using System;
 using HolyHell.Battle.Card;
 using HolyHell.Battle;
+using R3;
 
 /// <summary>
 /// Displays a single card in hand
@@ -38,21 +39,26 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f);
     [SerializeField] private Color unplayableColor = Color.gray;
 
-    [Header("Hover Effect")]
+    [Header("Animation")]
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private float hoverScale = 1.1f;
     [SerializeField] private float hoverTransitionSpeed = 10f;
+    [SerializeField] private Vector2 selectedPosition = new Vector2(0, 50);
+    [SerializeField] private float selectedTransitionSpeed = 10f;
 
     private BattleManager battleManager;
     private CardInstance card;
     private Action<CardInstance> onClickCallback;
     private bool isPlayable = true;
     private bool isHovered = false;
+    private bool isSelected = false;
     private Vector3 originalScale;
+    private Vector2 originalAnchoredPosition;
 
     private void Awake()
     {
         originalScale = transform.localScale;
+        originalAnchoredPosition = transform.GetComponent<RectTransform>().anchoredPosition;
     }
 
     public void Initialize(BattleManager battleManager, CardInstance cardInstance, Action<CardInstance> onClick)
@@ -60,6 +66,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         this.battleManager = battleManager;
         card = cardInstance;
         onClickCallback = onClick;
+        battleManager.currentSelectedCard.Subscribe(card =>
+        {
+            isSelected = card != null && card.instanceId == this.card.instanceId;
+        }).AddTo(this);
 
         if (card == null || card.cardData == null)
         {
@@ -139,7 +149,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             }
         }
 
-        if(angelBg != null)
+        if (angelBg != null)
         {
             angelBg.gameObject.SetActive(card.AngelGaugeIncrease != 0);
         }
@@ -204,7 +214,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         // Smooth hover scale animation
         Vector3 targetScale = isHovered ? originalScale * hoverScale : originalScale;
+        Vector2 targetPosition = isSelected ? selectedPosition : originalAnchoredPosition;
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * hoverTransitionSpeed);
+        var rectT = transform.GetComponent<RectTransform>();
+        rectT.anchoredPosition = Vector2.Lerp(rectT.anchoredPosition, targetPosition, Time.deltaTime * selectedTransitionSpeed);
     }
 
     // IPointerClickHandler

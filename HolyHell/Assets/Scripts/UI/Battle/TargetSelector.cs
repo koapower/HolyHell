@@ -108,7 +108,7 @@ public class TargetSelector : MonoBehaviour
         }
     }
 
-    public void Input_Cancel(InputAction.CallbackContext ctx)
+    public void Input_Cancel()
     {
         if (isSelectingTarget) CancelTargetSelection();
     }

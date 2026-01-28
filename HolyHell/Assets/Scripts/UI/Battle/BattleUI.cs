@@ -68,7 +68,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
         var inputMap = InputSystem.actions.FindActionMap("Battle");
         cancelAction = inputMap.FindAction("Cancel");
-        cancelAction.performed += targetSelector.Input_Cancel;
+        cancelAction.performed += Input_Cancel;
         closeCardPreviewAction = inputMap.FindAction("CloseCardPreview");
         closeCardPreviewAction.canceled += Input_CloseCardPreview;
     }
@@ -205,6 +205,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     /// </summary>
     private void OnCardClicked(CardInstance card)
     {
+        battleManager.currentSelectedCard.Value = card;
         if (targetSelector != null)
         {
             targetSelector.StartTargetSelection(card);
@@ -220,6 +221,12 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         {
             targetSelector.OnTargetSelected(enemy);
         }
+    }
+
+    private void Input_Cancel(InputAction.CallbackContext ctx)
+    {
+        battleManager.currentSelectedCard.Value = null;
+        targetSelector.Input_Cancel();
     }
 
     private void Input_CloseCardPreview(InputAction.CallbackContext ctx)

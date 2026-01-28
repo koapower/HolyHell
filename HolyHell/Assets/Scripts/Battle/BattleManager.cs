@@ -25,6 +25,7 @@ namespace HolyHell.Battle
         // Battle variables
         public ReactiveProperty<BattleState> battleState = new ReactiveProperty<BattleState>(BattleState.NotStarted);
         public ReactiveProperty<CardInstance> currentPreviewCard = new ReactiveProperty<CardInstance>();
+        public ReactiveProperty<CardInstance> currentSelectedCard = new ReactiveProperty<CardInstance>();
 
         // Table managers
         private ITableManager tableManager;
