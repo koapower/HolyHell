@@ -95,13 +95,18 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             isSelected = card != null && card.instanceId == this.card.instanceId;
         }).AddTo(disposables);
 
-        // this logic has a flaw if state changes before card awaiting use is set
-        battleManager.cardInteractionState.Subscribe(state =>
-        {
-            var awaitingCard = battleManager.cardAwaitingUse.Value;
-            bool shouldShowButton = state == CardInteractionState.AwaitingUse && awaitingCard != null && awaitingCard.instanceId == this.card.instanceId;
-            ShowUseButton(shouldShowButton);
-        }).AddTo(disposables);
+        Observable
+           .CombineLatest(
+               battleManager.currentSelectedCard,
+               battleManager.cardInteractionState,
+               (selectedCard, state) =>
+                   selectedCard != null &&
+                   selectedCard.instanceId == this.card.instanceId &&
+                   state == CardInteractionState.AwaitingUse
+           )
+           .DistinctUntilChanged()
+           .Subscribe(ShowUseButton)
+           .AddTo(disposables);
 
         // Setup Use button click handler
         if (useButton != null)
