@@ -17,6 +17,7 @@ public class HandUI : MonoBehaviour
     [SerializeField] private FanLayoutGroup fanLayoutGroup;
     [SerializeField] private Transform cardContainer;
     [SerializeField] private CardSlotUI cardSlotPrefab;
+    [SerializeField] private RectTransform handRectTransform;
 
     private BattleManager battleManager;
     private PlayerEntity player;
@@ -25,6 +26,7 @@ public class HandUI : MonoBehaviour
     private List<CardUI> cardUIList = new List<CardUI>();
     private ISynchronizedView<CardInstance, GameObject> view;
     private bool _isLayoutDirty = false;
+    private Camera cachedCamera;
 
     public void Initialize(BattleManager battleManager, PlayerEntity playerEntity, Action<CardInstance> onCardClick)
     {
@@ -33,6 +35,23 @@ public class HandUI : MonoBehaviour
         this.battleManager = battleManager;
         player = playerEntity;
         onCardClickCallback = onCardClick;
+
+        // Get or create handRectTransform if not assigned
+        if (handRectTransform == null)
+        {
+            handRectTransform = GetComponent<RectTransform>();
+        }
+
+        // Cache the camera for RectTransform checks
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera)
+        {
+            cachedCamera = canvas.worldCamera;
+        }
+        else
+        {
+            cachedCamera = null; // For ScreenSpaceOverlay
+        }
 
         if (player == null)
         {
@@ -126,7 +145,7 @@ public class HandUI : MonoBehaviour
 
         if (cardSlotUIObj != null)
         {
-            cardSlotUIObj.cardUI.Initialize(battleManager, card, OnCardClicked);
+            cardSlotUIObj.cardUI.Initialize(battleManager, card, OnCardClicked, this);
             cardSlotUIList.Add(cardSlotUIObj);
             cardUIList.Add(cardSlotUIObj.cardUI);
         }
@@ -182,6 +201,29 @@ public class HandUI : MonoBehaviour
             }
         }
         cardSlotUIList.Clear();
+    }
+
+    /// <summary>
+    /// Check if a screen position is within the HandUI bounds
+    /// </summary>
+    public bool IsPositionInHandUI(Vector2 screenPosition)
+    {
+        if (handRectTransform == null)
+            return false;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            handRectTransform,
+            screenPosition,
+            cachedCamera
+        );
+    }
+
+    /// <summary>
+    /// Get the RectTransform of HandUI
+    /// </summary>
+    public RectTransform GetRectTransform()
+    {
+        return handRectTransform;
     }
 
     /// <summary>

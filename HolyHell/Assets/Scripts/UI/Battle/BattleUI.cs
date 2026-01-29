@@ -31,6 +31,9 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     [Header("Target Selection")]
     [SerializeField] private TargetSelector targetSelector;
 
+    [Header("Card Interaction")]
+    [SerializeField] private CancelUseCardButtonUI cancelUseCardButtonUI;
+
     private BattleManager battleManager;
     private InputAction cancelAction;
     private InputAction closeCardPreviewAction;
@@ -66,11 +69,37 @@ public class BattleUI : MonoBehaviour, IUIInitializable
             OnBattleStateChanged(state);
         }).AddTo(disposables);
 
+        // Subscribe to card interaction state changes
+        battleManager.cardInteractionState.Subscribe(state =>
+        {
+            OnCardInteractionStateChanged(state);
+        }).AddTo(disposables);
+
         var inputMap = InputSystem.actions.FindActionMap("Battle");
         cancelAction = inputMap.FindAction("Cancel");
         cancelAction.performed += Input_Cancel;
         closeCardPreviewAction = inputMap.FindAction("CloseCardPreview");
         closeCardPreviewAction.canceled += Input_CloseCardPreview;
+    }
+
+    /// <summary>
+    /// Called when card interaction state changes
+    /// </summary>
+    private void OnCardInteractionStateChanged(CardInteractionState state)
+    {
+        Debug.Log($"BattleUI: Card interaction state changed to {state}");
+
+        switch (state)
+        {
+            case CardInteractionState.SelectingTarget:
+                // Enter target selection mode
+                var card = battleManager.cardAwaitingUse.Value;
+                if (card != null && targetSelector != null)
+                {
+                    targetSelector.StartTargetSelection(card);
+                }
+                break;
+        }
     }
 
     /// <summary>
@@ -148,6 +177,13 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         if (targetSelector != null)
             targetSelector.Initialize(battleManager, enemyListUI);
 
+        // Initialize cancel button (Use button is now handled by CardUI)
+        if (cancelUseCardButtonUI != null)
+        {
+            cancelUseCardButtonUI.Initialize(battleManager);
+            cancelUseCardButtonUI.onCancelButtonClicked += OnCancelButtonClicked;
+        }
+
         isComponentsInitialized = true;
         Debug.Log("BattleUI: Components initialized");
     }
@@ -202,13 +238,36 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     /// <summary>
     /// Called when player clicks a card in hand
+    /// Note: With the new interaction system, this is no longer directly called
+    /// Card clicks now trigger cardAwaitingUse state instead
     /// </summary>
     private void OnCardClicked(CardInstance card)
     {
-        battleManager.currentSelectedCard.Value = card;
+        // This callback is still passed to HandUI but CardUI now handles the click internally
+        // Kept for backward compatibility
+    }
+
+    /// <summary>
+    /// Called when Cancel button is clicked
+    /// </summary>
+    private void OnCancelButtonClicked()
+    {
+        Debug.Log("Cancel button clicked");
+        CancelCardInteraction();
+    }
+
+    /// <summary>
+    /// Cancel current card interaction
+    /// </summary>
+    private void CancelCardInteraction()
+    {
+        battleManager.cardAwaitingUse.Value = null;
+        battleManager.currentSelectedCard.Value = null;
+        battleManager.cardInteractionState.Value = CardInteractionState.Idle;
+
         if (targetSelector != null)
         {
-            targetSelector.StartTargetSelection(card);
+            targetSelector.CancelTargetSelection();
         }
     }
 
@@ -225,8 +284,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     private void Input_Cancel(InputAction.CallbackContext ctx)
     {
-        battleManager.currentSelectedCard.Value = null;
-        targetSelector.Input_Cancel();
+        CancelCardInteraction();
     }
 
     private void Input_CloseCardPreview(InputAction.CallbackContext ctx)
