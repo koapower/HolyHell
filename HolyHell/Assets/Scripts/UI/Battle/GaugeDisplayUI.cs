@@ -64,8 +64,6 @@ public class GaugeDisplayUI : MonoBehaviour
         {
             UpdateDemonGauge(value);
         }).AddTo(disposables);
-
-        Debug.Log("GaugeDisplayUI initialized");
     }
 
     private void UpdateAngelGauge(int value)
@@ -100,7 +98,6 @@ public class GaugeDisplayUI : MonoBehaviour
     public void Cleanup()
     {
         disposables.Clear();
-        Debug.Log("GaugeDisplayUI cleaned up");
     }
 
     private void OnDestroy()

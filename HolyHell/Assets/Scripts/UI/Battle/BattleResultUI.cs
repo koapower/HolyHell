@@ -64,8 +64,6 @@ public class BattleResultUI : MonoBehaviour
         {
             continueButton.onClick.AddListener(OnContinueClicked);
         }
-
-        Debug.Log("BattleResultUI initialized");
     }
 
     private void ShowResult(BattleManager battleManager)
@@ -158,7 +156,6 @@ public class BattleResultUI : MonoBehaviour
         }
 
         disposables.Clear();
-        Debug.Log("BattleResultUI cleaned up");
     }
 
     private void OnDestroy()

@@ -48,7 +48,7 @@ public class CardPreviewUI : MonoBehaviour
         isDisplaying = card != null;
         if (card != null)
         {
-            cardPreview.Initialize(battleManager, card, null);
+            cardPreview.Initialize(battleManager, card, null, null);
         }
     }
 }
