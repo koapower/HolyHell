@@ -27,6 +27,10 @@ namespace HolyHell.Battle
         public ReactiveProperty<CardInstance> currentPreviewCard = new ReactiveProperty<CardInstance>();
         public ReactiveProperty<CardInstance> currentSelectedCard = new ReactiveProperty<CardInstance>();
 
+        // Card interaction state
+        public ReactiveProperty<CardInteractionState> cardInteractionState = new ReactiveProperty<CardInteractionState>(CardInteractionState.Idle);
+        public ReactiveProperty<CardInstance> cardAwaitingUse = new ReactiveProperty<CardInstance>();
+
         // Table managers
         private ITableManager tableManager;
 
@@ -342,6 +346,18 @@ namespace HolyHell.Battle
             battleState?.Dispose();
             battleState = null;
 
+            currentPreviewCard?.Dispose();
+            currentPreviewCard = null;
+
+            currentSelectedCard?.Dispose();
+            currentSelectedCard = null;
+
+            cardInteractionState?.Dispose();
+            cardInteractionState = null;
+
+            cardAwaitingUse?.Dispose();
+            cardAwaitingUse = null;
+
             Debug.Log("BattleManager disposed");
         }
     }
@@ -355,5 +371,17 @@ namespace HolyHell.Battle
         Initializing,
         InProgress,
         Ended
+    }
+
+    /// <summary>
+    /// Card interaction state enum
+    /// </summary>
+    public enum CardInteractionState
+    {
+        Idle,           // No interaction
+        Pressing,       // Holding down (within HandUI)
+        Dragging,       // Dragging (left HandUI)
+        AwaitingUse,    // Waiting for Use button click
+        SelectingTarget // Selecting target
     }
 }

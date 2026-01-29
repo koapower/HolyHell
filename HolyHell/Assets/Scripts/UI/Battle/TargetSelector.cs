@@ -85,6 +85,11 @@ public class TargetSelector : MonoBehaviour
 
         // End target selection
         EndTargetSelection();
+
+        // Update interaction state
+        battleManager.cardAwaitingUse.Value = null;
+        battleManager.currentSelectedCard.Value = null;
+        battleManager.cardInteractionState.Value = CardInteractionState.Idle;
     }
 
     /// <summary>
