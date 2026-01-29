@@ -18,6 +18,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     [SerializeField] private ActionPointUI actionPointUI;
     [SerializeField] private HandUI handUI;
     [SerializeField] private DeckCounterUI deckCounterUI;
+    [SerializeField] private CardPreviewUI cardPreviewUI;
 
     [Header("Enemy UI")]
     [SerializeField] private EnemyListUI enemyListUI;
@@ -31,6 +32,8 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     [SerializeField] private TargetSelector targetSelector;
 
     private BattleManager battleManager;
+    private InputAction cancelAction;
+    private InputAction closeCardPreviewAction;
     private CompositeDisposable disposables = new CompositeDisposable();
     private bool isComponentsInitialized = false;
 
@@ -63,7 +66,11 @@ public class BattleUI : MonoBehaviour, IUIInitializable
             OnBattleStateChanged(state);
         }).AddTo(disposables);
 
-        InputSystem.actions.FindActionMap("Battle").FindAction("CloseCardPreview").canceled += Input_CloseCardPreview;
+        var inputMap = InputSystem.actions.FindActionMap("Battle");
+        cancelAction = inputMap.FindAction("Cancel");
+        cancelAction.performed += Input_Cancel;
+        closeCardPreviewAction = inputMap.FindAction("CloseCardPreview");
+        closeCardPreviewAction.canceled += Input_CloseCardPreview;
     }
 
     /// <summary>
@@ -115,10 +122,13 @@ public class BattleUI : MonoBehaviour, IUIInitializable
             actionPointUI.Initialize(battleManager.player);
 
         if (handUI != null && battleManager.player != null)
-            handUI.Initialize(battleManager.player, OnCardClicked);
+            handUI.Initialize(battleManager, battleManager.player, OnCardClicked);
 
         if (deckCounterUI != null && battleManager.player != null)
             deckCounterUI.Initialize(battleManager.player);
+
+        if (cardPreviewUI != null)
+            cardPreviewUI.Initialize(battleManager);
 
         // Initialize enemy UI
         if (enemyListUI != null && battleManager.enemies != null)
@@ -195,6 +205,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     /// </summary>
     private void OnCardClicked(CardInstance card)
     {
+        battleManager.currentSelectedCard.Value = card;
         if (targetSelector != null)
         {
             targetSelector.StartTargetSelection(card);
@@ -212,10 +223,15 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         }
     }
 
+    private void Input_Cancel(InputAction.CallbackContext ctx)
+    {
+        battleManager.currentSelectedCard.Value = null;
+        targetSelector.Input_Cancel();
+    }
+
     private void Input_CloseCardPreview(InputAction.CallbackContext ctx)
     {
-        //TODO
-        Debug.Log("release left button");
+        battleManager.currentPreviewCard.Value = null;
     }
 
     /// <summary>
@@ -224,6 +240,10 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     private void OnDestroy()
     {
         CleanupComponents();
+        cancelAction.Dispose();
+        cancelAction = null;
+        closeCardPreviewAction.Dispose();
+        closeCardPreviewAction = null;
         disposables.Dispose();
         Debug.Log("BattleUI destroyed");
     }

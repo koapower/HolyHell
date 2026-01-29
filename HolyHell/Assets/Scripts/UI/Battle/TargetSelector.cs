@@ -15,17 +15,11 @@ public class TargetSelector : MonoBehaviour
     private CardInstance currentCard;
     private bool isSelectingTarget = false;
 
-    private InputAction cancelAction; //TODO set it in input map instead, this is just for testing
-
     public void Initialize(BattleManager manager, EnemyListUI enemyList)
     {
         battleManager = manager;
         enemyListUI = enemyList;
 
-        cancelAction = new InputAction("TempCancel", binding: "<Keyboard>/escape");
-        cancelAction.AddBinding("<Mouse>/rightButton");
-        cancelAction.performed += _ => { if (isSelectingTarget) CancelTargetSelection(); };
-        cancelAction.Enable();
         Debug.Log("TargetSelector initialized");
     }
 
@@ -114,25 +108,16 @@ public class TargetSelector : MonoBehaviour
         }
     }
 
-    //private void Update()
-    //{
-    //    // Cancel target selection on right click or ESC
-    //    if (isSelectingTarget)
-    //    {
-    //        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
-    //        {
-    //            CancelTargetSelection();
-    //        }
-    //    }
-    //}
+    public void Input_Cancel()
+    {
+        if (isSelectingTarget) CancelTargetSelection();
+    }
 
     public void Cleanup()
     {
         EndTargetSelection();
         battleManager = null;
         enemyListUI = null;
-        cancelAction.Dispose();
-        cancelAction = null;
         Debug.Log("TargetSelector cleaned up");
     }
 }

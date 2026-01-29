@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System;
 using HolyHell.Battle.Card;
+using HolyHell.Battle;
+using R3;
 
 /// <summary>
 /// Displays a single card in hand
@@ -16,6 +18,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private TextMeshProUGUI costText;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Image elementImage;
+    [SerializeField] private Color angelColor = new Color(1f, 0.9f, 0.5f); // Light gold
+    [SerializeField] private Color demonColor = new Color(0.6f, 0.2f, 0.8f); // Dark purple]
     [SerializeField] private Color blissColor = Color.purple;
     [SerializeField] private Color dominationColor = Color.red;
     [SerializeField] private Color enlightendColor = Color.yellow;
@@ -23,6 +27,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Color ravenousColor = Color.green;
 
     [Header("Gauge Display")]
+    [SerializeField] private Image angelBg;
+    [SerializeField] private Image demonBg;
     [SerializeField] private TextMeshProUGUI angelGaugeText;
     [SerializeField] private TextMeshProUGUI demonGaugeText;
 
@@ -33,25 +39,37 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f);
     [SerializeField] private Color unplayableColor = Color.gray;
 
-    [Header("Hover Effect")]
+    [Header("Animation")]
+    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private float hoverScale = 1.1f;
     [SerializeField] private float hoverTransitionSpeed = 10f;
+    [SerializeField] private Vector2 selectedPosition = new Vector2(0, 50);
+    [SerializeField] private float selectedTransitionSpeed = 10f;
 
+    private BattleManager battleManager;
     private CardInstance card;
     private Action<CardInstance> onClickCallback;
     private bool isPlayable = true;
     private bool isHovered = false;
+    private bool isSelected = false;
     private Vector3 originalScale;
+    private Vector2 originalAnchoredPosition;
 
     private void Awake()
     {
         originalScale = transform.localScale;
+        originalAnchoredPosition = transform.GetComponent<RectTransform>().anchoredPosition;
     }
 
-    public void Initialize(CardInstance cardInstance, Action<CardInstance> onClick)
+    public void Initialize(BattleManager battleManager, CardInstance cardInstance, Action<CardInstance> onClick)
     {
+        this.battleManager = battleManager;
         card = cardInstance;
         onClickCallback = onClick;
+        battleManager.currentSelectedCard.Subscribe(card =>
+        {
+            isSelected = card != null && card.instanceId == this.card.instanceId;
+        }).AddTo(this);
 
         if (card == null || card.cardData == null)
         {
@@ -68,6 +86,12 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (cardNameText != null)
         {
             cardNameText.text = card.DisplayName;
+            cardNameText.color = card.cardData.Faction switch
+            {
+                Faction.Angel => angelColor,
+                Faction.Demon => demonColor,
+                _ => Color.white
+            };
         }
 
         // Cost
@@ -102,8 +126,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             if (card.AngelGaugeIncrease != 0)
             {
                 angelGaugeText.text = card.AngelGaugeIncrease > 0
-                    ? $"+{card.AngelGaugeIncrease} Light"
-                    : $"{card.AngelGaugeIncrease} Light";
+                    ? $"+{card.AngelGaugeIncrease}"
+                    : $"{card.AngelGaugeIncrease}";
             }
             else
             {
@@ -116,13 +140,23 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             if (card.DemonGaugeIncrease != 0)
             {
                 demonGaugeText.text = card.DemonGaugeIncrease > 0
-                    ? $"+{card.DemonGaugeIncrease} Dark"
-                    : $"{card.DemonGaugeIncrease} Dark";
+                    ? $"+{card.DemonGaugeIncrease}"
+                    : $"{card.DemonGaugeIncrease}";
             }
             else
             {
                 demonGaugeText.text = "";
             }
+        }
+
+        if (angelBg != null)
+        {
+            angelBg.gameObject.SetActive(card.AngelGaugeIncrease != 0);
+        }
+
+        if (demonBg != null)
+        {
+            demonBg.gameObject.SetActive(card.DemonGaugeIncrease != 0);
         }
 
         // Set card frame color based on faction
@@ -151,6 +185,13 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         UpdateVisual();
     }
 
+    public void SetCardInteractability(bool canInteract)
+    {
+        // default is true
+        canvasGroup.blocksRaycasts = canInteract;
+        canvasGroup.interactable = canInteract;
+    }
+
     private void UpdateVisual()
     {
         if (backgroundImage == null) return;
@@ -173,7 +214,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         // Smooth hover scale animation
         Vector3 targetScale = isHovered ? originalScale * hoverScale : originalScale;
+        Vector2 targetPosition = isSelected ? selectedPosition : originalAnchoredPosition;
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * hoverTransitionSpeed);
+        var rectT = transform.GetComponent<RectTransform>();
+        rectT.anchoredPosition = Vector2.Lerp(rectT.anchoredPosition, targetPosition, Time.deltaTime * selectedTransitionSpeed);
     }
 
     // IPointerClickHandler
@@ -211,6 +255,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
-
+        Debug.Log($"ponterdown {card.DisplayName}");
+        battleManager.currentPreviewCard.Value = card;
     }
 }

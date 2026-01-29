@@ -22,8 +22,10 @@ namespace HolyHell.Battle
         public TurnSystem turnSystem;
         public CardEffectExecutor cardEffectExecutor;
 
-        // Battle state
+        // Battle variables
         public ReactiveProperty<BattleState> battleState = new ReactiveProperty<BattleState>(BattleState.NotStarted);
+        public ReactiveProperty<CardInstance> currentPreviewCard = new ReactiveProperty<CardInstance>();
+        public ReactiveProperty<CardInstance> currentSelectedCard = new ReactiveProperty<CardInstance>();
 
         // Table managers
         private ITableManager tableManager;
