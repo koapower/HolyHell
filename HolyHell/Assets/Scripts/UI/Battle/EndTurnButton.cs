@@ -35,8 +35,6 @@ public class EndTurnButton : MonoBehaviour
                 UpdateButtonState(phase);
             }).AddTo(disposables);
         }
-
-        Debug.Log("EndTurnButton initialized");
     }
 
     private void OnButtonClicked()
@@ -65,7 +63,6 @@ public class EndTurnButton : MonoBehaviour
 
         disposables.Clear();
         battleManager = null;
-        Debug.Log("EndTurnButton cleaned up");
     }
 
     private void OnDestroy()

@@ -19,8 +19,6 @@ public class TargetSelector : MonoBehaviour
     {
         battleManager = manager;
         enemyListUI = enemyList;
-
-        Debug.Log("TargetSelector initialized");
     }
 
     /// <summary>
@@ -123,6 +121,5 @@ public class TargetSelector : MonoBehaviour
         EndTargetSelection();
         battleManager = null;
         enemyListUI = null;
-        Debug.Log("TargetSelector cleaned up");
     }
 }

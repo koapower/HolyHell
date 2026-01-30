@@ -1,12 +1,14 @@
+using HolyHell.Battle;
+using HolyHell.Battle.Card;
+using HolyHell.UI.Battle;
+using R3;
+using System;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using TMPro;
-using System;
-using HolyHell.Battle.Card;
-using HolyHell.Battle;
-using R3;
+using UnityEngine.UI;
 
 /// <summary>
 /// Displays a single card in hand
@@ -47,17 +49,15 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private Vector2 selectedPosition = new Vector2(0, 50);
     [SerializeField] private float selectedTransitionSpeed = 20f;
 
-    [Header("Drag Settings")]
-    [SerializeField] private float dragThresholdDistance = 5f; // Pixels to move before considering it a drag
-
     [Header("Use Button")]
     [SerializeField] private GameObject useButtonObject; // The Use button UI (child of this card)
     [SerializeField] private Button useButton; // Reference to the button component
 
+
     private BattleManager battleManager;
     private HandUI handUI;
     private CardInstance card;
-    private Action<CardInstance> onClickCallback;
+    private CardDragHandler dragHandler; // Get from BattleUI
     private bool isPlayable = true;
     private bool isHovered = false;
     private bool isSelected = false;
@@ -68,8 +68,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     // State machine variables
     private CardInteractionState currentState = CardInteractionState.Idle;
-    private Vector2 pointerDownPosition;
-    private float pointerDownTime;
     private bool hasMovedOutOfHandUI = false;
     private Transform originalParent;
     private int originalSiblingIndex;
@@ -82,12 +80,12 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         originalAnchoredPosition = rectTransform.anchoredPosition;
     }
 
-    public void Initialize(BattleManager battleManager, CardInstance cardInstance, Action<CardInstance> onClick, HandUI handUI = null)
+    public void Initialize(BattleManager battleManager, CardInstance cardInstance, CardDragHandler dragHandler, HandUI handUI)
     {
         this.battleManager = battleManager;
+        this.dragHandler = dragHandler;
         this.handUI = handUI;
         card = cardInstance;
-        onClickCallback = onClick;
 
         // Subscribe to selection state
         battleManager.currentSelectedCard.Subscribe(card =>
@@ -314,6 +312,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         battleManager.currentPreviewCard.Value = null;
 
         // Update BattleManager state
+        battleManager.currentSelectedCard.Value = card;
         battleManager.cardInteractionState.Value = CardInteractionState.Dragging;
 
         // Store original parent and move card to higher layer
@@ -353,27 +352,27 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (Mouse.current == null) return;
 
-        // Check if card requires target (simplified - assume all cards need targets for now)
-        bool requiresTarget = DoesCardRequireTarget();
+        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+        bool requiresTarget = dragHandler != null && dragHandler.DoesCardRequireTarget(card);
 
         if (!requiresTarget)
         {
             // No target required - card follows mouse
-            Vector2 screenPos = Mouse.current.position.ReadValue();
             Vector3 worldPos;
             RectTransformUtility.ScreenPointToWorldPointInRectangle(
                 rectTransform,
-                screenPos,
+                mouseScreenPos,
                 GetCanvasCamera(),
                 out worldPos
             );
             rectTransform.position = worldPos;
             rectTransform.localRotation = Quaternion.identity;
         }
-        else
+
+        // Delegate drag line and target detection to drag handler
+        if (dragHandler != null)
         {
-            // Requires target - show targeting line (will implement in Phase 4)
-            // For now, keep card in place
+            dragHandler.UpdateDrag(rectTransform);
         }
     }
 
@@ -385,14 +384,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             return canvas.worldCamera;
         }
         return null;
-    }
-
-    private bool DoesCardRequireTarget()
-    {
-        // Simplified logic: check if any effect targets enemies
-        // This is a placeholder - you may want to implement more sophisticated logic
-        // For now, assume all cards require target (like in original implementation)
-        return true;
     }
 
     private void CancelLongTapPreview()
@@ -413,8 +404,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         Debug.Log($"Use button clicked for card: {card.DisplayName}");
 
-        // Check if card requires target (simplified - assume all cards need targets)
-        bool requiresTarget = DoesCardRequireTarget();
+        // Check if card requires target
+        bool requiresTarget = dragHandler != null && dragHandler.DoesCardRequireTarget(card);
 
         if (!requiresTarget)
         {
@@ -475,8 +466,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (!isPlayable) return;
 
-        pointerDownPosition = eventData.position;
-        pointerDownTime = Time.time;
         currentState = CardInteractionState.Pressing;
 
         // Start long tap timer for preview (0.3 seconds)
@@ -536,7 +525,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             return;
         }
 
-        bool requiresTarget = DoesCardRequireTarget();
+        bool requiresTarget = dragHandler != null && dragHandler.DoesCardRequireTarget(card);
         bool inHandUI = handUI != null && handUI.IsPositionInHandUI(Mouse.current.position.ReadValue());
 
         if (inHandUI)
@@ -550,16 +539,28 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             // No target required - play card immediately
             Debug.Log($"Playing card without target via drag: {card.DisplayName}");
-            battleManager.PlayCard(card, null);
+            bool success = battleManager.PlayCard(card, null);
             ExitDraggingState();
         }
         else
         {
-            // Requires target - check if we're over a valid target
-            // This will be implemented in Phase 4 with target detection
-            // For now, just return card to hand
-            Debug.Log($"Card requires target - returning to hand (Phase 4 will implement target detection)");
-            ExitDraggingState();
+            // Requires target - get locked target from drag handler
+            var targetEnemy = dragHandler?.GetLockedTarget();
+            bool isLocked = dragHandler != null && dragHandler.IsLockedToTarget;
+
+            if (isLocked && targetEnemy != null)
+            {
+                // Play card on the target
+                Debug.Log($"Playing card on target: {card.DisplayName} -> {targetEnemy.enemyData?.DisplayName}");
+                bool success = battleManager.PlayCard(card, targetEnemy);
+                ExitDraggingState();
+            }
+            else
+            {
+                // No valid target - return card to hand with animation
+                Debug.Log($"No valid target - returning card to hand");
+                ExitDraggingState();
+            }
         }
     }
 
@@ -571,6 +572,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             useButton.onClick.RemoveListener(OnUseButtonClicked);
         }
+
+        // Note: dragHandler is managed by BattleUI, don't cleanup here
 
         disposables.Dispose();
     }

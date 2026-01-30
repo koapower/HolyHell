@@ -42,8 +42,6 @@ public class EntityStatusUI : MonoBehaviour
         {
             UpdateShield(shield);
         }).AddTo(disposables);
-
-        Debug.Log("EntityStatusUI initialized");
     }
 
     private void UpdateHP(int hp, int maxHp)
@@ -79,7 +77,6 @@ public class EntityStatusUI : MonoBehaviour
     public void Cleanup()
     {
         disposables.Clear();
-        Debug.Log("EntityStatusUI cleaned up");
     }
 
     private void OnDestroy()

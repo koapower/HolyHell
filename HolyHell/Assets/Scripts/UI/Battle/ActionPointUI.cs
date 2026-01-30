@@ -47,8 +47,6 @@ public class ActionPointUI : MonoBehaviour
                 RebuildIcons(max);
             }
         }).AddTo(disposables);
-
-        Debug.Log("ActionPointUI initialized");
     }
 
     private void UpdateDisplay(int current, int max)
@@ -128,8 +126,6 @@ public class ActionPointUI : MonoBehaviour
                 Destroy(icon.gameObject);
         }
         actionPointIcons.Clear();
-
-        Debug.Log("ActionPointUI cleaned up");
     }
 
     private void OnDestroy()

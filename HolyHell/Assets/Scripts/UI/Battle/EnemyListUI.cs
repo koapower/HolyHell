@@ -92,6 +92,24 @@ public class EnemyListUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Find EnemyUI component by its EnemyEntity (cached lookup)
+    /// </summary>
+    public EnemyUI FindEnemyUI(EnemyEntity enemy)
+    {
+        if (enemy == null) return null;
+
+        return enemyUIList.Find(ui => ui != null && ui.Enemy == enemy);
+    }
+
+    /// <summary>
+    /// Get all active enemy UIs
+    /// </summary>
+    public List<EnemyUI> GetAllEnemyUIs()
+    {
+        return new List<EnemyUI>(enemyUIList);
+    }
+
     private void ClearEnemyUI()
     {
         foreach (var enemyUI in enemyUIList)
@@ -108,7 +126,6 @@ public class EnemyListUI : MonoBehaviour
     {
         ClearEnemyUI();
         onEnemyClickCallback = null;
-        Debug.Log("EnemyListUI cleaned up");
     }
 
     private void OnDestroy()

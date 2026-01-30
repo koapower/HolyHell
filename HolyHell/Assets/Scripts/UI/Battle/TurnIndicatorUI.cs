@@ -32,8 +32,6 @@ public class TurnIndicatorUI : MonoBehaviour
         {
             UpdateTurnNumber(turnNum);
         }).AddTo(disposables);
-
-        Debug.Log("TurnIndicatorUI initialized");
     }
 
     private void UpdatePhase(TurnPhase phase)
@@ -61,7 +59,6 @@ public class TurnIndicatorUI : MonoBehaviour
     public void Cleanup()
     {
         disposables.Clear();
-        Debug.Log("TurnIndicatorUI cleaned up");
     }
 
     private void OnDestroy()

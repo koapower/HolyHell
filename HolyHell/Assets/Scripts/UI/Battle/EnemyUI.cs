@@ -37,6 +37,11 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     private bool isTargetable = false;
     private bool isDead = false;
 
+    /// <summary>
+    /// Public accessor for the enemy entity this UI represents
+    /// </summary>
+    public EnemyEntity Enemy => enemy;
+
     public void Initialize(EnemyEntity enemyEntity, Action<EnemyEntity> onClick)
     {
         enemy = enemyEntity;
@@ -173,8 +178,6 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         onClickCallback = null;
         isTargetable = false;
         isDead = false;
-
-        Debug.Log("EnemyUI cleaned up");
     }
 
     private void OnDestroy()

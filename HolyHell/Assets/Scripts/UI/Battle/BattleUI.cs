@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using HolyHell.Battle;
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
+using HolyHell.UI.Battle;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -33,6 +34,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     [Header("Card Interaction")]
     [SerializeField] private CancelUseCardButtonUI cancelUseCardButtonUI;
+    [SerializeField] private CardDragHandler cardDragHandler;
 
     private BattleManager battleManager;
     private InputAction cancelAction;
@@ -150,18 +152,22 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         if (actionPointUI != null && battleManager.player != null)
             actionPointUI.Initialize(battleManager.player);
 
+        // Initialize enemy UI first (needed by other components)
+        if (enemyListUI != null && battleManager.enemies != null)
+            enemyListUI.Initialize(battleManager.enemies, OnEnemyClicked);
+
+        // Initialize CardDragHandler (singleton managed by BattleUI)
+        if (cardDragHandler != null)
+            cardDragHandler.Initialize(battleManager, handUI, enemyListUI);
+
         if (handUI != null && battleManager.player != null)
-            handUI.Initialize(battleManager, battleManager.player, OnCardClicked);
+            handUI.Initialize(battleManager, cardDragHandler, battleManager.player);
 
         if (deckCounterUI != null && battleManager.player != null)
             deckCounterUI.Initialize(battleManager.player);
 
         if (cardPreviewUI != null)
             cardPreviewUI.Initialize(battleManager);
-
-        // Initialize enemy UI
-        if (enemyListUI != null && battleManager.enemies != null)
-            enemyListUI.Initialize(battleManager.enemies, OnEnemyClicked);
 
         // Initialize battle flow UI
         if (turnIndicatorUI != null && battleManager.turnSystem != null)
@@ -232,8 +238,10 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         if (targetSelector != null)
             targetSelector.Cleanup();
 
+        if (cardDragHandler != null)
+            cardDragHandler.Cleanup();
+
         isComponentsInitialized = false;
-        Debug.Log("BattleUI: Components cleaned up");
     }
 
     /// <summary>
@@ -252,7 +260,6 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     /// </summary>
     private void OnCancelButtonClicked()
     {
-        Debug.Log("Cancel button clicked");
         CancelCardInteraction();
     }
 

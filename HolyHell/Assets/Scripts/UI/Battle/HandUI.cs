@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using HolyHell.Battle;
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
+using HolyHell.UI.Battle;
 using ObservableCollections;
 using R3;
 using System;
@@ -20,21 +21,21 @@ public class HandUI : MonoBehaviour
     [SerializeField] private RectTransform handRectTransform;
 
     private BattleManager battleManager;
+    private CardDragHandler dragHandler;
     private PlayerEntity player;
-    private Action<CardInstance> onCardClickCallback;
     private List<CardSlotUI> cardSlotUIList = new List<CardSlotUI>();
     private List<CardUI> cardUIList = new List<CardUI>();
     private ISynchronizedView<CardInstance, GameObject> view;
     private bool _isLayoutDirty = false;
     private Camera cachedCamera;
 
-    public void Initialize(BattleManager battleManager, PlayerEntity playerEntity, Action<CardInstance> onCardClick)
+    public void Initialize(BattleManager battleManager, CardDragHandler dragHandler, PlayerEntity playerEntity)
     {
         cardSlotPrefab.gameObject.SetActive(false);
 
         this.battleManager = battleManager;
+        this.dragHandler = dragHandler;
         player = playerEntity;
-        onCardClickCallback = onCardClick;
 
         // Get or create handRectTransform if not assigned
         if (handRectTransform == null)
@@ -67,7 +68,6 @@ public class HandUI : MonoBehaviour
         view.ViewChanged += View_ViewChanged;
 
         //RebuildHand();
-        Debug.Log("HandUI initialized");
     }
 
     void View_ViewChanged(in SynchronizedViewChangedEventArgs<CardInstance, GameObject> eventArgs)
@@ -145,7 +145,7 @@ public class HandUI : MonoBehaviour
 
         if (cardSlotUIObj != null)
         {
-            cardSlotUIObj.cardUI.Initialize(battleManager, card, OnCardClicked, this);
+            cardSlotUIObj.cardUI.Initialize(battleManager, card, dragHandler, this);
             cardSlotUIList.Add(cardSlotUIObj);
             cardUIList.Add(cardSlotUIObj.cardUI);
         }
@@ -162,11 +162,6 @@ public class HandUI : MonoBehaviour
         cardSlotUIList.Remove(slot);
         cardUIList.Remove(slot.cardUI);
         Destroy(slot.gameObject);
-    }
-
-    private void OnCardClicked(CardInstance card)
-    {
-        onCardClickCallback?.Invoke(card);
     }
 
     /// <summary>
@@ -233,8 +228,6 @@ public class HandUI : MonoBehaviour
     {
         ClearHand();
         player = null;
-        onCardClickCallback = null;
-        Debug.Log("HandUI cleaned up");
     }
 
     private void OnDestroy()

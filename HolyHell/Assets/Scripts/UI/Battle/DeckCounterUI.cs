@@ -22,8 +22,6 @@ public class DeckCounterUI : MonoBehaviour
             Debug.LogError("DeckCounterUI: Player is null!");
             return;
         }
-
-        Debug.Log("DeckCounterUI initialized");
     }
 
     private void Update()
@@ -60,6 +58,5 @@ public class DeckCounterUI : MonoBehaviour
     public void Cleanup()
     {
         player = null;
-        Debug.Log("DeckCounterUI cleaned up");
     }
 }
