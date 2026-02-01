@@ -49,7 +49,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     private void OnDisable()
     {
-        InputManager.Instance.PopActionMap("Battle");
+        InputManager.Instance?.PopActionMap("Battle");
     }
 
     public async UniTask Init()
