@@ -27,10 +27,10 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
 
     [Header("Visual Feedback")]
     [SerializeField] private Image backgroundImage;
-    [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f);
-    [SerializeField] private Color targetableColor = new Color(0.8f, 1f, 0.8f);
-    [SerializeField] private Color deadColor = Color.gray;
+    [SerializeField] private Color normalColor = new Color(1,1,1,0.5f);
+    [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f, 0.5f);
+    [SerializeField] private Color targetableColor = new Color(0.8f, 1f, 0.8f, 0.5f);
+    [SerializeField] private Color deadColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
 
     private float YOffset = 1.7f;
 

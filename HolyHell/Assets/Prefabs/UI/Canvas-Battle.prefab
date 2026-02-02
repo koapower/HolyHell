@@ -3449,10 +3449,10 @@ MonoBehaviour:
   intentText: {fileID: 6105281414565460325}
   intentIcon: {fileID: 0}
   backgroundImage: {fileID: 2350641210504878011}
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
-  hoverColor: {r: 1, g: 1, b: 0.8, a: 1}
-  targetableColor: {r: 0.8, g: 1, b: 0.8, a: 1}
-  deadColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 0.3137255}
+  hoverColor: {r: 1, g: 1, b: 0.8, a: 0.3137255}
+  targetableColor: {r: 0.8, g: 1, b: 0.8, a: 0.3137255}
+  deadColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.3137255}
 --- !u!222 &5475464172379300866
 CanvasRenderer:
   m_ObjectHideFlags: 0
