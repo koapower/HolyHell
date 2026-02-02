@@ -32,7 +32,7 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     [SerializeField] private Color targetableColor = new Color(0.8f, 1f, 0.8f);
     [SerializeField] private Color deadColor = Color.gray;
 
-    private float YOffset = 500f;
+    private float YOffset = 1.7f;
 
     private EnemyEntity enemy;
     private Action<EnemyEntity> onClickCallback;
@@ -79,9 +79,10 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     {
         gameObject.SetActive(false);
         await UniTask.NextFrame();
-        var screenPos = Camera.main.WorldToScreenPoint(enemy.transform.position);
+        var targetWorldPos = enemy.transform.position;
+        targetWorldPos.y += YOffset;
+        var screenPos = Camera.main.WorldToScreenPoint(targetWorldPos);
         if (screenPos.z < 0) return;
-        screenPos.y += YOffset;
         RectTransform rt = transform as RectTransform;
         rt.position = screenPos;
         gameObject.SetActive(true);
