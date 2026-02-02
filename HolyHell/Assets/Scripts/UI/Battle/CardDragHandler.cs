@@ -17,8 +17,10 @@ namespace HolyHell.UI.Battle
     public class CardDragHandler : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private CardDragLineRenderer dragLineRenderer;
+        [SerializeField] private Canvas canvas;
         [SerializeField] private GraphicRaycaster graphicRaycaster;
+        [SerializeField] private CardDragLineRenderer dragLineRenderer;
+        [SerializeField] private RectTransform aimObject;
 
         private BattleManager battleManager;
         private HandUI handUI;
@@ -43,6 +45,7 @@ namespace HolyHell.UI.Battle
             this.handUI = handUI;
             this.enemyListUI = enemyListUI;
             dragLineRenderer.Hide();
+            aimObject.gameObject.SetActive(false);
 
             // Subscribe to card interaction state changes
             battleManager.cardInteractionState
@@ -74,8 +77,6 @@ namespace HolyHell.UI.Battle
             {
                 dragLineRenderer.Show();
             }
-
-            Debug.Log($"CardDragHandler: Started dragging for card: {currentCard.DisplayName}");
         }
 
         /// <summary>
@@ -85,10 +86,14 @@ namespace HolyHell.UI.Battle
         {
             isDragging = false;
 
-            // Hide drag line
+            // Hide ui elements
             if (dragLineRenderer != null)
             {
                 dragLineRenderer.Hide();
+            }
+            if (aimObject != null)
+            {
+                aimObject.gameObject.SetActive(false);
             }
 
             // Reset targeting
@@ -96,8 +101,6 @@ namespace HolyHell.UI.Battle
             isLockedToTarget = false;
             currentCard = null;
             currentCardRectTransform = null;
-
-            Debug.Log($"CardDragHandler: Ended dragging");
         }
 
         /// <summary>
@@ -143,6 +146,30 @@ namespace HolyHell.UI.Battle
                         // Line to mouse position
                         dragLineRenderer.UpdateLineFromUIToScreen(currentCardRectTransform, mouseScreenPos, false);
                     }
+                }
+
+                if (aimObject != null)
+                {
+                    Vector3 worldPos = default;
+                    if (isLockedToTarget && currentHoveredEnemy != null)
+                    {
+                        var enemyUI = FindEnemyUI(currentHoveredEnemy);
+                        if (enemyUI != null)
+                        {
+                            worldPos = enemyUI.transform.position;
+                        }
+                    }
+                    else
+                    {
+                        RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                            aimObject,
+                            mouseScreenPos,
+                            canvas.worldCamera,
+                            out worldPos
+                        );
+                    }
+                    aimObject.gameObject.SetActive(true);
+                    aimObject.transform.position = worldPos;
                 }
             }
         }
@@ -277,6 +304,15 @@ namespace HolyHell.UI.Battle
         public EnemyEntity GetLockedTarget()
         {
             return isLockedToTarget ? currentHoveredEnemy : null;
+        }
+
+        public Camera GetCanvasCamera()
+        {
+            if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                return canvas.worldCamera;
+            }
+            return null;
         }
 
         /// <summary>

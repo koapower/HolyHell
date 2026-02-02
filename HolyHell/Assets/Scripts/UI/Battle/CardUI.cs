@@ -362,7 +362,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             RectTransformUtility.ScreenPointToWorldPointInRectangle(
                 rectTransform,
                 mouseScreenPos,
-                GetCanvasCamera(),
+                dragHandler.GetCanvasCamera(),
                 out worldPos
             );
             rectTransform.position = worldPos;
@@ -374,16 +374,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             dragHandler.UpdateDrag(rectTransform);
         }
-    }
-
-    private Camera GetCanvasCamera()
-    {
-        Canvas canvas = GetComponentInParent<Canvas>();
-        if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera)
-        {
-            return canvas.worldCamera;
-        }
-        return null;
     }
 
     private void CancelLongTapPreview()

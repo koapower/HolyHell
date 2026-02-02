@@ -52,7 +52,6 @@ namespace HolyHell.UI.Battle
             gameObject.SetActive(true);
             shineTimer = 0f; // Reset shine animation
             SetVerticesDirty(); // Force mesh rebuild
-            Debug.Log("CardDragLineRenderer: Show line");
         }
 
         /// <summary>
@@ -115,7 +114,6 @@ namespace HolyHell.UI.Battle
         public void UpdateLineFromUI(RectTransform startRect, Vector3 endWorldPos, bool isLocked = false)
         {
             // Convert world positions to screen space
-            Canvas canvas = GetComponentInParent<Canvas>();
             Camera cam = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
 
             Vector2 startScreenPos = RectTransformUtility.WorldToScreenPoint(cam, startRect.position);
@@ -129,7 +127,6 @@ namespace HolyHell.UI.Battle
         /// </summary>
         public void UpdateLineFromUIToScreen(RectTransform startRect, Vector2 screenPos, bool isLocked = false)
         {
-            Canvas canvas = GetComponentInParent<Canvas>();
             Camera cam = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
 
             Vector2 startScreenPos = RectTransformUtility.WorldToScreenPoint(cam, startRect.position);
