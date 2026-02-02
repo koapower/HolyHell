@@ -45,7 +45,7 @@ Material:
     - _EnableExternalAlpha: 0
     - _GradientPower: 1
     - _ShineIntensity: 2
-    - _ShinePosition: 0.38797754
+    - _ShinePosition: 0.2541114
     - _ShineWidth: 0.1
     - _Stencil: 0
     - _StencilComp: 8

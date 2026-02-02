@@ -65,7 +65,9 @@ public class ServiceLocator : MonoSingleton<ServiceLocator>
         Register<IAssetLoader>(() => new AssetLoader());
         Register<ITableManager>(() => new TableManager());
         //Register<ISceneManagementService>(() => new SceneManagementService());
-        Register<IBattleManager>(() => new BattleManager(Get<ITableManager>()));
+        Register<IBattleManager>(() => new BattleManager(
+            Get<IAssetLoader>(),
+            Get<ITableManager>()));
 
     }
 
