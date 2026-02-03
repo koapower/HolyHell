@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbcd34ab7ffe4b546877cb1e434e8d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HolyHell.Battle.Entity.EnemyEntity
+  spriteRenderer: {fileID: 2739983866459199967}
 --- !u!1 &8284590755183166909
 GameObject:
   m_ObjectHideFlags: 0

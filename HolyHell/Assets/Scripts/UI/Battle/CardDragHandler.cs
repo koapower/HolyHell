@@ -1,12 +1,9 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using HolyHell.Battle.Card;
 using HolyHell.Battle;
 using HolyHell.Battle.Entity;
 using R3;
-using System.Collections.Generic;
 
 namespace HolyHell.UI.Battle
 {
@@ -18,7 +15,6 @@ namespace HolyHell.UI.Battle
     {
         [Header("References")]
         [SerializeField] private Canvas canvas;
-        [SerializeField] private GraphicRaycaster graphicRaycaster;
         [SerializeField] private CardDragLineRenderer dragLineRenderer;
         [SerializeField] private RectTransform aimObject;
 
@@ -76,6 +72,18 @@ namespace HolyHell.UI.Battle
             if (DoesCardRequireTarget() && dragLineRenderer != null)
             {
                 dragLineRenderer.Show();
+
+                // Set all living enemies as targetable
+                if (battleManager != null && battleManager.enemies != null)
+                {
+                    foreach (var enemy in battleManager.enemies)
+                    {
+                        if (enemy != null && enemy.hp.Value > 0)
+                        {
+                            enemy.SetTargetable(true);
+                        }
+                    }
+                }
             }
         }
 
@@ -94,6 +102,19 @@ namespace HolyHell.UI.Battle
             if (aimObject != null)
             {
                 aimObject.gameObject.SetActive(false);
+            }
+
+            // Clear targetable state from all enemies
+            if (battleManager != null && battleManager.enemies != null)
+            {
+                foreach (var enemy in battleManager.enemies)
+                {
+                    if (enemy != null)
+                    {
+                        enemy.SetTargetable(false);
+                        enemy.SetHovered(false);
+                    }
+                }
             }
 
             // Reset targeting
@@ -134,12 +155,8 @@ namespace HolyHell.UI.Battle
                     if (isLockedToTarget && currentHoveredEnemy != null)
                     {
                         // Line to enemy position
-                        var enemyUI = FindEnemyUI(currentHoveredEnemy);
-                        if (enemyUI != null)
-                        {
-                            var enemyRect = enemyUI.GetComponent<RectTransform>();
-                            dragLineRenderer.UpdateLineFromUI(currentCardRectTransform, enemyRect.position, true);
-                        }
+                        var screenPos = Camera.main.WorldToScreenPoint(currentHoveredEnemy.GetTargetWorldPosition());
+                        dragLineRenderer.UpdateLineFromUI(currentCardRectTransform, screenPos, true);
                     }
                     else
                     {
@@ -153,11 +170,7 @@ namespace HolyHell.UI.Battle
                     Vector3 worldPos = default;
                     if (isLockedToTarget && currentHoveredEnemy != null)
                     {
-                        var enemyUI = FindEnemyUI(currentHoveredEnemy);
-                        if (enemyUI != null)
-                        {
-                            worldPos = enemyUI.transform.position;
-                        }
+                        worldPos = Camera.main.WorldToScreenPoint(currentHoveredEnemy.GetTargetWorldPosition());
                     }
                     else
                     {
@@ -227,51 +240,49 @@ namespace HolyHell.UI.Battle
         }
 
         /// <summary>
-        /// Detect if mouse is hovering over an enemy using raycasting
+        /// Detect if mouse is hovering over an enemy using 2D raycasting
         /// </summary>
         private void DetectEnemyUnderMouse(Vector2 screenPos)
         {
-            if (graphicRaycaster == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(screenPos);
+            int enemyLayer = LayerMask.GetMask("Enemy");
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Camera.main.farClipPlane, enemyLayer);
+            Collider2D hitCollider = hit.collider;
 
-            PointerEventData pointerData = new PointerEventData(EventSystem.current)
-            {
-                position = screenPos
-            };
-
-            List<RaycastResult> results = new List<RaycastResult>();
-            graphicRaycaster.Raycast(pointerData, results);
-
-            // Find if any result is an EnemyUI
             EnemyEntity hoveredEnemy = null;
-            foreach (var result in results)
+            if (hitCollider != null)
             {
-                var enemyUI = result.gameObject.GetComponent<EnemyUI>();
-                if (enemyUI != null && enemyUI.Enemy != null && enemyUI.Enemy.hp.Value > 0)
+                var enemy = hitCollider.GetComponentInParent<EnemyEntity>(); // Assuming collider parent has EnemyEntity
+                if (enemy != null && enemy.hp.Value > 0)
                 {
-                    hoveredEnemy = enemyUI.Enemy;
-                    break;
+                    hoveredEnemy = enemy;
                 }
             }
 
-            // Update locked state
-            if (hoveredEnemy != null)
+            // Update hover state on enemies
+            if (hoveredEnemy != currentHoveredEnemy)
             {
-                if (currentHoveredEnemy != hoveredEnemy)
+                // Clear hover from previous enemy
+                if (currentHoveredEnemy != null)
                 {
-                    currentHoveredEnemy = hoveredEnemy;
+                    currentHoveredEnemy.SetHovered(false);
+                }
+
+                // Set hover on new enemy
+                if (hoveredEnemy != null)
+                {
+                    hoveredEnemy.SetHovered(true);
                     Debug.Log($"CardDragHandler: Locked onto enemy: {hoveredEnemy.enemyData?.DisplayName}");
                 }
-                isLockedToTarget = true;
-            }
-            else
-            {
-                if (isLockedToTarget)
+                else if (isLockedToTarget)
                 {
                     Debug.Log("CardDragHandler: Unlocked from enemy");
                 }
-                currentHoveredEnemy = null;
-                isLockedToTarget = false;
+
+                currentHoveredEnemy = hoveredEnemy;
             }
+
+            isLockedToTarget = hoveredEnemy != null;
         }
 
         /// <summary>

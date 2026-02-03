@@ -1214,7 +1214,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HolyHell.UI.Battle.CardDragHandler
   canvas: {fileID: 7835389269537828640}
-  graphicRaycaster: {fileID: 6675167266904412553}
   dragLineRenderer: {fileID: 8947742590720945813}
   aimObject: {fileID: 6784806879845869123}
 --- !u!1 &2996515492566429523
@@ -3448,7 +3447,7 @@ MonoBehaviour:
   buffView: {fileID: 612901631503411671}
   intentText: {fileID: 6105281414565460325}
   intentIcon: {fileID: 0}
-  backgroundImage: {fileID: 2350641210504878011}
+  backgroundImage: {fileID: 0}
   normalColor: {r: 1, g: 1, b: 1, a: 0.3137255}
   hoverColor: {r: 1, g: 1, b: 0.8, a: 0.3137255}
   targetableColor: {r: 0.8, g: 1, b: 0.8, a: 0.3137255}
