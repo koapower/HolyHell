@@ -31,11 +31,13 @@ namespace HolyHell.Battle
         public ReactiveProperty<CardInteractionState> cardInteractionState = new ReactiveProperty<CardInteractionState>(CardInteractionState.Idle);
         public ReactiveProperty<CardInstance> cardAwaitingUse = new ReactiveProperty<CardInstance>();
 
-        // Table managers
+        // managers
+        private IAssetLoader assetLoader;
         private ITableManager tableManager;
 
-        public BattleManager(ITableManager tableManager)
+        public BattleManager(IAssetLoader assetLoader, ITableManager tableManager)
         {
+            this.assetLoader = assetLoader;
             this.tableManager = tableManager;
         }
 
@@ -50,7 +52,7 @@ namespace HolyHell.Battle
         /// <summary>
         /// Start a new battle
         /// </summary>
-        public async UniTask StartBattle(List<string> playerDeckCardIds, List<string> enemyIds)
+        public async UniTask StartBattle(List<string> playerDeckCardIds, List<EnemySetupInfo> enemyInfos)
         {
             Debug.Log("===== BATTLE START =====");
 
@@ -63,7 +65,7 @@ namespace HolyHell.Battle
             await InitializePlayer(playerDeckCardIds);
 
             // Initialize enemies
-            await InitializeEnemies(enemyIds);
+            await InitializeEnemies(enemyInfos);
 
             // Create turn system
             turnSystem = new TurnSystem(this, player, enemies);
@@ -119,23 +121,26 @@ namespace HolyHell.Battle
         /// <summary>
         /// Initialize enemy entities from enemy IDs
         /// </summary>
-        private async UniTask InitializeEnemies(List<string> enemyIds)
+        private async UniTask InitializeEnemies(List<EnemySetupInfo> enemyInfos)
         {
             var enemyTable = tableManager.GetTable<EnemyRow>();
             var skillTable = tableManager.GetTable<MonsterSkillRow>();
 
-            foreach (var enemyId in enemyIds)
+            int enemyIndex = 0;
+            foreach (var enemyInfo in enemyInfos)
             {
-                var enemyData = enemyTable.GetRow(e => e.Id == enemyId);
+                var enemyData = enemyTable.GetRow(e => e.Id == enemyInfo.Id);
                 if (enemyData == null)
                 {
-                    Debug.LogError($"Enemy data not found: {enemyId}");
+                    Debug.LogError($"Enemy data not found: {enemyInfo.Id}");
                     continue;
                 }
 
                 // Create enemy GameObject
-                var enemyGO = new GameObject($"Enemy_{enemyData.DisplayName}");
-                var enemy = enemyGO.AddComponent<EnemyEntity>();
+                var enemyGO = await assetLoader.InstaniateAsync("Res:/Characters/EnemyEntity.prefab", null);
+                enemyGO.name = $"Enemy_{enemyData.DisplayName}";
+                enemyGO.transform.position = enemyInfo.worldPosition;
+                var enemy = enemyGO.GetComponent<EnemyEntity>();
 
                 // Load skills
                 var skills = new List<EnemySkill>();
@@ -156,7 +161,7 @@ namespace HolyHell.Battle
                 enemy.Initialize(enemyData, skills);
 
                 enemies.Add(enemy);
-
+                enemyIndex++;
                 Debug.Log($"Enemy initialized: {enemyData.DisplayName}, HP={enemy.hp.Value}, Skills={skills.Count}");
             }
 

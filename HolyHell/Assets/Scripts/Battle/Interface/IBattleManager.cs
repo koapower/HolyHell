@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace HolyHell.Battle
 {
     public interface IBattleManager : IGameService
     {
-        UniTask StartBattle(List<string> playerDeckCardIds, List<string> enemyIds);
+        UniTask StartBattle(List<string> playerDeckCardIds, List<EnemySetupInfo> enemyInfos);
     }
 }

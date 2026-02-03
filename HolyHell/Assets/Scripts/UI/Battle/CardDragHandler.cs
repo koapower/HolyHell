@@ -1,12 +1,9 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using HolyHell.Battle.Card;
 using HolyHell.Battle;
 using HolyHell.Battle.Entity;
 using R3;
-using System.Collections.Generic;
 
 namespace HolyHell.UI.Battle
 {
@@ -17,8 +14,9 @@ namespace HolyHell.UI.Battle
     public class CardDragHandler : MonoBehaviour
     {
         [Header("References")]
+        [SerializeField] private Canvas canvas;
         [SerializeField] private CardDragLineRenderer dragLineRenderer;
-        [SerializeField] private GraphicRaycaster graphicRaycaster;
+        [SerializeField] private RectTransform aimObject;
 
         private BattleManager battleManager;
         private HandUI handUI;
@@ -43,6 +41,7 @@ namespace HolyHell.UI.Battle
             this.handUI = handUI;
             this.enemyListUI = enemyListUI;
             dragLineRenderer.Hide();
+            aimObject.gameObject.SetActive(false);
 
             // Subscribe to card interaction state changes
             battleManager.cardInteractionState
@@ -73,9 +72,20 @@ namespace HolyHell.UI.Battle
             if (DoesCardRequireTarget() && dragLineRenderer != null)
             {
                 dragLineRenderer.Show();
-            }
 
-            Debug.Log($"CardDragHandler: Started dragging for card: {currentCard.DisplayName}");
+                // Enter selection mode for all enemies
+                // Each enemy will decide if it can be targeted
+                if (battleManager != null && battleManager.enemies != null)
+                {
+                    foreach (var enemy in battleManager.enemies)
+                    {
+                        if (enemy != null)
+                        {
+                            enemy.EnterSelectionMode();
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -85,10 +95,26 @@ namespace HolyHell.UI.Battle
         {
             isDragging = false;
 
-            // Hide drag line
+            // Hide ui elements
             if (dragLineRenderer != null)
             {
                 dragLineRenderer.Hide();
+            }
+            if (aimObject != null)
+            {
+                aimObject.gameObject.SetActive(false);
+            }
+
+            // Exit selection mode for all enemies
+            if (battleManager != null && battleManager.enemies != null)
+            {
+                foreach (var enemy in battleManager.enemies)
+                {
+                    if (enemy != null)
+                    {
+                        enemy.ExitSelectionMode();
+                    }
+                }
             }
 
             // Reset targeting
@@ -96,8 +122,6 @@ namespace HolyHell.UI.Battle
             isLockedToTarget = false;
             currentCard = null;
             currentCardRectTransform = null;
-
-            Debug.Log($"CardDragHandler: Ended dragging");
         }
 
         /// <summary>
@@ -131,18 +155,34 @@ namespace HolyHell.UI.Battle
                     if (isLockedToTarget && currentHoveredEnemy != null)
                     {
                         // Line to enemy position
-                        var enemyUI = FindEnemyUI(currentHoveredEnemy);
-                        if (enemyUI != null)
-                        {
-                            var enemyRect = enemyUI.GetComponent<RectTransform>();
-                            dragLineRenderer.UpdateLineFromUI(currentCardRectTransform, enemyRect.position, true);
-                        }
+                        var screenPos = Camera.main.WorldToScreenPoint(currentHoveredEnemy.GetTargetWorldPosition());
+                        dragLineRenderer.UpdateLineFromUI(currentCardRectTransform, screenPos, true);
                     }
                     else
                     {
                         // Line to mouse position
                         dragLineRenderer.UpdateLineFromUIToScreen(currentCardRectTransform, mouseScreenPos, false);
                     }
+                }
+
+                if (aimObject != null)
+                {
+                    Vector3 worldPos = default;
+                    if (isLockedToTarget && currentHoveredEnemy != null)
+                    {
+                        worldPos = Camera.main.WorldToScreenPoint(currentHoveredEnemy.GetTargetWorldPosition());
+                    }
+                    else
+                    {
+                        RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                            aimObject,
+                            mouseScreenPos,
+                            canvas.worldCamera,
+                            out worldPos
+                        );
+                    }
+                    aimObject.gameObject.SetActive(true);
+                    aimObject.transform.position = worldPos;
                 }
             }
         }
@@ -200,51 +240,49 @@ namespace HolyHell.UI.Battle
         }
 
         /// <summary>
-        /// Detect if mouse is hovering over an enemy using raycasting
+        /// Detect if mouse is hovering over an enemy using 2D raycasting
         /// </summary>
         private void DetectEnemyUnderMouse(Vector2 screenPos)
         {
-            if (graphicRaycaster == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(screenPos);
+            int enemyLayer = LayerMask.GetMask("Enemy");
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Camera.main.farClipPlane, enemyLayer);
+            Collider2D hitCollider = hit.collider;
 
-            PointerEventData pointerData = new PointerEventData(EventSystem.current)
-            {
-                position = screenPos
-            };
-
-            List<RaycastResult> results = new List<RaycastResult>();
-            graphicRaycaster.Raycast(pointerData, results);
-
-            // Find if any result is an EnemyUI
             EnemyEntity hoveredEnemy = null;
-            foreach (var result in results)
+            if (hitCollider != null)
             {
-                var enemyUI = result.gameObject.GetComponent<EnemyUI>();
-                if (enemyUI != null && enemyUI.Enemy != null && enemyUI.Enemy.hp.Value > 0)
+                var enemy = hitCollider.GetComponentInParent<EnemyEntity>(); // Assuming collider parent has EnemyEntity
+                if (enemy != null && enemy.CanBeTargeted())
                 {
-                    hoveredEnemy = enemyUI.Enemy;
-                    break;
+                    hoveredEnemy = enemy;
                 }
             }
 
-            // Update locked state
-            if (hoveredEnemy != null)
+            // Update hover state on enemies
+            if (hoveredEnemy != currentHoveredEnemy)
             {
-                if (currentHoveredEnemy != hoveredEnemy)
+                // Clear hover from previous enemy
+                if (currentHoveredEnemy != null)
                 {
-                    currentHoveredEnemy = hoveredEnemy;
+                    currentHoveredEnemy.SetHovered(false);
+                }
+
+                // Set hover on new enemy
+                if (hoveredEnemy != null)
+                {
+                    hoveredEnemy.SetHovered(true);
                     Debug.Log($"CardDragHandler: Locked onto enemy: {hoveredEnemy.enemyData?.DisplayName}");
                 }
-                isLockedToTarget = true;
-            }
-            else
-            {
-                if (isLockedToTarget)
+                else if (isLockedToTarget)
                 {
                     Debug.Log("CardDragHandler: Unlocked from enemy");
                 }
-                currentHoveredEnemy = null;
-                isLockedToTarget = false;
+
+                currentHoveredEnemy = hoveredEnemy;
             }
+
+            isLockedToTarget = hoveredEnemy != null;
         }
 
         /// <summary>
@@ -277,6 +315,15 @@ namespace HolyHell.UI.Battle
         public EnemyEntity GetLockedTarget()
         {
             return isLockedToTarget ? currentHoveredEnemy : null;
+        }
+
+        public Camera GetCanvasCamera()
+        {
+            if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                return canvas.worldCamera;
+            }
+            return null;
         }
 
         /// <summary>

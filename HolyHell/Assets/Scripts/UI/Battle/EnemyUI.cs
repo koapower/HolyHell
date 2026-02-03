@@ -6,6 +6,7 @@ using R3;
 using System;
 using HolyHell.Battle.Entity;
 using HolyHell.Battle.Enemy;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// Displays a single enemy's status and intent
@@ -26,10 +27,12 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
 
     [Header("Visual Feedback")]
     [SerializeField] private Image backgroundImage;
-    [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f);
-    [SerializeField] private Color targetableColor = new Color(0.8f, 1f, 0.8f);
-    [SerializeField] private Color deadColor = Color.gray;
+    [SerializeField] private Color normalColor = new Color(1,1,1,0.5f);
+    [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.8f, 0.5f);
+    [SerializeField] private Color targetableColor = new Color(0.8f, 1f, 0.8f, 0.5f);
+    [SerializeField] private Color deadColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+
+    private float YOffset = 1.7f;
 
     private EnemyEntity enemy;
     private Action<EnemyEntity> onClickCallback;
@@ -68,7 +71,21 @@ public class EnemyUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
             UpdateIntent(intent);
         }).AddTo(disposables);
 
+        SetSelfPosition().Forget();
         Debug.Log($"EnemyUI initialized for {enemy.enemyData?.DisplayName}");
+    }
+
+    private async UniTaskVoid SetSelfPosition()
+    {
+        gameObject.SetActive(false);
+        await UniTask.NextFrame();
+        var targetWorldPos = enemy.transform.position;
+        targetWorldPos.y += YOffset;
+        var screenPos = Camera.main.WorldToScreenPoint(targetWorldPos);
+        if (screenPos.z < 0) return;
+        RectTransform rt = transform as RectTransform;
+        rt.position = screenPos;
+        gameObject.SetActive(true);
     }
 
     private void UpdateIntent(EnemySkill intent)

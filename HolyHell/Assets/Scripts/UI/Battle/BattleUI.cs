@@ -38,7 +38,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     private BattleManager battleManager;
     private InputAction cancelAction;
-    private InputAction closeCardPreviewAction;
+    private InputAction mouseLeftAction;
     private CompositeDisposable disposables = new CompositeDisposable();
     private bool isComponentsInitialized = false;
 
@@ -49,7 +49,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     private void OnDisable()
     {
-        InputManager.Instance.PopActionMap("Battle");
+        InputManager.Instance?.PopActionMap("Battle");
     }
 
     public async UniTask Init()
@@ -80,8 +80,9 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         var inputMap = InputSystem.actions.FindActionMap("Battle");
         cancelAction = inputMap.FindAction("Cancel");
         cancelAction.performed += Input_Cancel;
-        closeCardPreviewAction = inputMap.FindAction("CloseCardPreview");
-        closeCardPreviewAction.canceled += Input_CloseCardPreview;
+        mouseLeftAction = inputMap.FindAction("MouseLeftButton");
+        mouseLeftAction.performed += Input_MouseRaycastCheck;
+        mouseLeftAction.canceled += Input_CloseCardPreview;
     }
 
     /// <summary>
@@ -245,17 +246,6 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     }
 
     /// <summary>
-    /// Called when player clicks a card in hand
-    /// Note: With the new interaction system, this is no longer directly called
-    /// Card clicks now trigger cardAwaitingUse state instead
-    /// </summary>
-    private void OnCardClicked(CardInstance card)
-    {
-        // This callback is still passed to HandUI but CardUI now handles the click internally
-        // Kept for backward compatibility
-    }
-
-    /// <summary>
     /// Called when Cancel button is clicked
     /// </summary>
     private void OnCancelButtonClicked()
@@ -294,6 +284,26 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         CancelCardInteraction();
     }
 
+    private void Input_MouseRaycastCheck(InputAction.CallbackContext ctx)
+    {
+        if (targetSelector.IsSelectingTarget)
+        {
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
+            int enemyLayer = LayerMask.GetMask("Enemy");
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Camera.main.farClipPlane, enemyLayer);
+            Collider2D hitCollider = hit.collider;
+            if (hitCollider != null)
+            {
+                var enemy = hitCollider.GetComponentInParent<EnemyEntity>(); // Assuming collider parent has EnemyEntity
+                if (enemy != null && enemy.CanBeTargeted())
+                {
+                    targetSelector.OnTargetSelected(enemy);
+                }
+            }
+        }
+    }
+
     private void Input_CloseCardPreview(InputAction.CallbackContext ctx)
     {
         battleManager.currentPreviewCard.Value = null;
@@ -307,8 +317,8 @@ public class BattleUI : MonoBehaviour, IUIInitializable
         CleanupComponents();
         cancelAction.Dispose();
         cancelAction = null;
-        closeCardPreviewAction.Dispose();
-        closeCardPreviewAction = null;
+        mouseLeftAction.Dispose();
+        mouseLeftAction = null;
         disposables.Dispose();
         Debug.Log("BattleUI destroyed");
     }
