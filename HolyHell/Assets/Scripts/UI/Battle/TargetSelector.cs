@@ -14,6 +14,7 @@ public class TargetSelector : MonoBehaviour
 
     private CardInstance currentCard;
     private bool isSelectingTarget = false;
+    public bool IsSelectingTarget => isSelectingTarget;
 
     public void Initialize(BattleManager manager, EnemyListUI enemyList)
     {
@@ -35,10 +36,17 @@ public class TargetSelector : MonoBehaviour
         currentCard = card;
         isSelectingTarget = true;
 
-        // Highlight all living enemies as targetable
-        if (enemyListUI != null)
+        // Enter selection mode for all enemies
+        // Each enemy will decide if it can be targeted
+        if (battleManager != null && battleManager.enemies != null)
         {
-            enemyListUI.SetAllTargetable(true);
+            foreach (var enemy in battleManager.enemies)
+            {
+                if (enemy != null)
+                {
+                    enemy.EnterSelectionMode();
+                }
+            }
         }
 
         Debug.Log($"Target selection started for card: {card.DisplayName}");
@@ -104,10 +112,16 @@ public class TargetSelector : MonoBehaviour
         isSelectingTarget = false;
         currentCard = null;
 
-        // Remove targetable highlights
-        if (enemyListUI != null)
+        // Exit selection mode for all enemies
+        if (battleManager != null && battleManager.enemies != null)
         {
-            enemyListUI.SetAllTargetable(false);
+            foreach (var enemy in battleManager.enemies)
+            {
+                if (enemy != null)
+                {
+                    enemy.ExitSelectionMode();
+                }
+            }
         }
     }
 

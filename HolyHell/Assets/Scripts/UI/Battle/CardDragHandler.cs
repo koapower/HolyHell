@@ -73,14 +73,15 @@ namespace HolyHell.UI.Battle
             {
                 dragLineRenderer.Show();
 
-                // Set all living enemies as targetable
+                // Enter selection mode for all enemies
+                // Each enemy will decide if it can be targeted
                 if (battleManager != null && battleManager.enemies != null)
                 {
                     foreach (var enemy in battleManager.enemies)
                     {
-                        if (enemy != null && enemy.hp.Value > 0)
+                        if (enemy != null)
                         {
-                            enemy.SetTargetable(true);
+                            enemy.EnterSelectionMode();
                         }
                     }
                 }
@@ -104,15 +105,14 @@ namespace HolyHell.UI.Battle
                 aimObject.gameObject.SetActive(false);
             }
 
-            // Clear targetable state from all enemies
+            // Exit selection mode for all enemies
             if (battleManager != null && battleManager.enemies != null)
             {
                 foreach (var enemy in battleManager.enemies)
                 {
                     if (enemy != null)
                     {
-                        enemy.SetTargetable(false);
-                        enemy.SetHovered(false);
+                        enemy.ExitSelectionMode();
                     }
                 }
             }
@@ -253,7 +253,7 @@ namespace HolyHell.UI.Battle
             if (hitCollider != null)
             {
                 var enemy = hitCollider.GetComponentInParent<EnemyEntity>(); // Assuming collider parent has EnemyEntity
-                if (enemy != null && enemy.hp.Value > 0)
+                if (enemy != null && enemy.CanBeTargeted())
                 {
                     hoveredEnemy = enemy;
                 }

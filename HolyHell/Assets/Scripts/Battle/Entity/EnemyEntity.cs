@@ -8,6 +8,8 @@ namespace HolyHell.Battle.Entity
     public class EnemyEntity : BattleEntity
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private BoxCollider2D boxCollider2D;
+
         // Enemy data reference
         public EnemyRow enemyData;
 
@@ -24,7 +26,7 @@ namespace HolyHell.Battle.Entity
         private Color originalColor;
         private Color hoverColor = new Color(1f, 1f, 0.8f, 1f);
         private Color targetableColor = new Color(0.8f, 1f, 0.8f, 1f);
-        private bool isTargetable = false;
+        private bool isInSelectionMode = false; // Whether selection mode is active globally
         private bool isHovered = false;
 
         public void Initialize(EnemyRow data, List<EnemySkill> skills)
@@ -40,9 +42,21 @@ namespace HolyHell.Battle.Entity
             // Initialize AI
             ai = new EnemyAI(this);
 
+            // Get references
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (boxCollider2D == null)
+                boxCollider2D = GetComponent<BoxCollider2D>();
+
             if (spriteRenderer != null)
             {
                 originalColor = spriteRenderer.color;
+            }
+
+            // Initially disable collider (not in selection mode)
+            if (boxCollider2D != null)
+            {
+                boxCollider2D.enabled = false;
             }
         }
 
@@ -52,21 +66,87 @@ namespace HolyHell.Battle.Entity
         }
 
         /// <summary>
-        /// Set whether this enemy can be targeted (visual feedback)
+        /// Enter selection mode - entity decides if it can be targeted
         /// </summary>
-        public void SetTargetable(bool targetable)
+        public void EnterSelectionMode()
         {
-            isTargetable = targetable;
+            isInSelectionMode = true;
+
+            // Check if this enemy can be targeted based on its state
+            bool canBeTargeted = CanBeTargeted();
+
+            if (canBeTargeted)
+            {
+                // Enable collider to allow raycasting
+                if (boxCollider2D != null)
+                {
+                    boxCollider2D.enabled = true;
+                }
+
+                // Update visual to show targetable
+                UpdateVisual();
+            }
+            else
+            {
+                // Keep collider disabled
+                if (boxCollider2D != null)
+                {
+                    boxCollider2D.enabled = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Exit selection mode - disable interaction
+        /// </summary>
+        public void ExitSelectionMode()
+        {
+            isInSelectionMode = false;
+            isHovered = false;
+
+            // Disable collider
+            if (boxCollider2D != null)
+            {
+                boxCollider2D.enabled = false;
+            }
+
+            // Reset visual
             UpdateVisual();
         }
 
         /// <summary>
         /// Set whether mouse is hovering over this enemy
+        /// Only effective when in selection mode
         /// </summary>
         public void SetHovered(bool hovered)
         {
+            if (!isInSelectionMode) return;
+
             isHovered = hovered;
             UpdateVisual();
+        }
+
+        /// <summary>
+        /// Check if this enemy can be targeted based on its current state
+        /// </summary>
+        public bool CanBeTargeted()
+        {
+            // Cannot target dead enemies
+            if (hp.Value <= 0) return false;
+
+            // Add more conditions here if needed (e.g., stunned, invisible, etc.)
+            // For example:
+            // if (HasBuff(BuffType.Untargetable)) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Public accessor to check if entity can currently be targeted
+        /// </summary>
+        public bool IsTargetable()
+        {
+            return isInSelectionMode && CanBeTargeted();
         }
 
         private void UpdateVisual()
@@ -80,16 +160,21 @@ namespace HolyHell.Battle.Entity
                 deadColor.a = 0.5f;
                 spriteRenderer.color = deadColor;
             }
-            else if (isHovered && isTargetable)
+            else if (isInSelectionMode && CanBeTargeted())
             {
-                spriteRenderer.color = hoverColor;
-            }
-            else if (isTargetable)
-            {
-                spriteRenderer.color = targetableColor;
+                // In selection mode and can be targeted
+                if (isHovered)
+                {
+                    spriteRenderer.color = hoverColor;
+                }
+                else
+                {
+                    spriteRenderer.color = targetableColor;
+                }
             }
             else
             {
+                // Normal state
                 spriteRenderer.color = originalColor;
             }
         }

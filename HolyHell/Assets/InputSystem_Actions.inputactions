@@ -1006,7 +1006,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "CloseCardPreview",
+                    "name": "MouseLeftButton",
                     "type": "Button",
                     "id": "23f9bf2b-eb3d-4afd-8f34-df02df17576b",
                     "expectedControlType": "",
@@ -1045,7 +1045,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "CloseCardPreview",
+                    "action": "MouseLeftButton",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

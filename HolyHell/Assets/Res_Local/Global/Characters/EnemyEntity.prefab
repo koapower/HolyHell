@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HolyHell.Battle.Entity.EnemyEntity
   spriteRenderer: {fileID: 2739983866459199967}
+  boxCollider2D: {fileID: 8453931730339084406}
 --- !u!1 &8284590755183166909
 GameObject:
   m_ObjectHideFlags: 0
