@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.49803922}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.65882355}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -870,7 +870,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30B9\u30D4\u3059\u3074\u304D"
+  m_text: nimble feetpooppoopooppooppopp
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e9fa5135c7b71d24da06da74ff5680ed, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 2df0d26fa2ac8784c9b808539eb7539f, type: 2}
@@ -897,7 +897,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 16
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -914,7 +914,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1019,7 +1019,6 @@ MonoBehaviour:
   hoverTransitionSpeed: 20
   selectedPosition: {x: 0, y: 50}
   selectedTransitionSpeed: 20
-  dragThresholdDistance: 5
   useButtonObject: {fileID: 9124964380706252554}
   useButton: {fileID: 7399827252386847336}
 --- !u!225 &3924497586694461845
@@ -1317,7 +1316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.24705882}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
