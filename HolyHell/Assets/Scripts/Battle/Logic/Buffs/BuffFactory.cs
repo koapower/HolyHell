@@ -27,7 +27,7 @@ namespace HolyHell.Battle.Logic.Buffs
                     float blessedPercent = ParseFloat(parameter, 5f); // Default 5% heal
                     return new BlessedBuff(blessedPercent, duration);
 
-                case BuffType.Lifesteel:
+                case BuffType.LifeSteal:
                     return new LifesteelBuff(duration);
 
                 case BuffType.ReqChange:
@@ -42,13 +42,33 @@ namespace HolyHell.Battle.Logic.Buffs
                     int boostAmount = ParseInt(parameter, 1); // Default +1 damage
                     return new BoostDmgBuff(boostAmount, stackCount, duration);
 
-                case BuffType.IncreaseRes:
-                    var (increaseElement, increaseResPercent) = ParseElementAndValue(parameter);
-                    return new IncreaseResBuff(increaseElement, increaseResPercent, stackCount, duration);
+                // Increase Resistance buffs -- all route to IncreaseResBuff with the corresponding ElementType
+                case BuffType.IncreaseAllRes:
+                    return new IncreaseResBuff(ElementType.All, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.IncreaseEnlRes:
+                    return new IncreaseResBuff(ElementType.Enlightened, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.IncreaseDomRes:
+                    return new IncreaseResBuff(ElementType.Domination, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.IncreaseBliRes:
+                    return new IncreaseResBuff(ElementType.Bliss, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.IncreaseRavRes:
+                    return new IncreaseResBuff(ElementType.Ravenous, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.IncreaseDesRes:
+                    return new IncreaseResBuff(ElementType.Despair, ParseFloat(parameter, 0f), stackCount, duration);
 
-                case BuffType.ReduceRes:
-                    var (reduceElement, reduceResPercent) = ParseElementAndValue(parameter);
-                    return new ReduceResBuff(reduceElement, reduceResPercent, stackCount, duration);
+                // Decrease Resistance buffs -- all route to ReduceResBuff with the corresponding ElementType
+                case BuffType.DecreaseAllRes:
+                    return new ReduceResBuff(ElementType.All, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.DecreaseEnlRes:
+                    return new ReduceResBuff(ElementType.Enlightened, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.DecreaseDomRes:
+                    return new ReduceResBuff(ElementType.Domination, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.DecreaseBliRes:
+                    return new ReduceResBuff(ElementType.Bliss, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.DecreaseRavRes:
+                    return new ReduceResBuff(ElementType.Ravenous, ParseFloat(parameter, 0f), stackCount, duration);
+                case BuffType.DecreaseDesRes:
+                    return new ReduceResBuff(ElementType.Despair, ParseFloat(parameter, 0f), stackCount, duration);
 
                 case BuffType.Fragile:
                     float fragilePercent = ParseFloat(parameter, 10f); // Default 10% increased damage taken
@@ -70,6 +90,9 @@ namespace HolyHell.Battle.Logic.Buffs
 
                 case BuffType.Gifted:
                     return new GiftedBuff(stackCount, duration);
+
+                case BuffType.Swift:
+                    return new SwiftBuff(parameter, duration);
 
                 case BuffType.None:
                 default:

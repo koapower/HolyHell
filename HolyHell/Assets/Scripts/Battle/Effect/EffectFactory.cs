@@ -58,6 +58,33 @@ namespace HolyHell.Battle.Effect
                 case CardEffectType.DelayAOEDamage:
                     return new DelayAOEDamageEffect(value, requirement);
 
+                case CardEffectType.ReduceCost:
+                    return new ReduceCostEffect(value, requirement);
+
+                case CardEffectType.SelfFlatHeal:
+                    return new SelfFlatHealEffect(value, requirement);
+
+                case CardEffectType.SelfPercHeal:
+                    return new SelfPercHealEffect(value, requirement);
+
+                case CardEffectType.DvalueInc:
+                    return new DvalueIncEffect(value, requirement);
+
+                case CardEffectType.DvalueDec:
+                    return new DvalueDecEffect(value, requirement);
+
+                case CardEffectType.AvalueInc:
+                    return new AvalueIncEffect(value, requirement);
+
+                case CardEffectType.AvalueDec:
+                    return new AvalueDecEffect(value, requirement);
+
+                case CardEffectType.SpendRepeatTheRest:
+                    return new SpendRepeatTheRestEffect(value, requirement);
+
+                case CardEffectType.GainAction:
+                    return new GainActionEffect(value, requirement);
+
                 default:
                     Debug.LogWarning($"EffectFactory: Unknown effect type {effectType}");
                     return null;

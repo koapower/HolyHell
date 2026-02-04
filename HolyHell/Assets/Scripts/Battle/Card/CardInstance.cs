@@ -24,6 +24,10 @@ namespace HolyHell.Battle.Card
             cardData = data;
             instanceId = Guid.NewGuid();
 
+            ActionCost = data.ActionCost;
+            AngelGaugeIncrease = data.AngelGaugeIncrease;
+            DemonGaugeIncrease = data.DemonGaugeIncrease;
+
             // Initialize effects from card data
             Effects = EffectFactory.CreateEffectsFromCardRow(data);
         }
@@ -31,9 +35,9 @@ namespace HolyHell.Battle.Card
         // Convenience accessors
         public string Id => cardData.Id;
         public string DisplayName => cardData.DisplayName;
-        public int ActionCost => cardData.ActionCost;
-        public int AngelGaugeIncrease => cardData.AngelGaugeIncrease;
-        public int DemonGaugeIncrease => cardData.DemonGaugeIncrease;
+        public int ActionCost { get; set; }
+        public int AngelGaugeIncrease { get; set; }
+        public int DemonGaugeIncrease { get; set; }
 
         // Effect accessors
         public CardEffectType GetEffectType(int index)

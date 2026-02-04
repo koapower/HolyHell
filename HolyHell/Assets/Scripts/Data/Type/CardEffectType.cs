@@ -1,6 +1,6 @@
 public enum CardEffectType
 {
-    None,
+    None = default,
     SingleDamage,
     AOEDamage,
     SelfBuff,
@@ -14,5 +14,13 @@ public enum CardEffectType
     SelfDamage,
     DelaySingleDamage,
     DelayAOEDamage,
-
+    ReduceCost,
+    SelfFlatHeal,
+    SelfPercHeal,
+    DvalueInc,
+    DvalueDec,
+    AvalueInc,
+    AvalueDec,
+    SpendRepeatTheRest,
+    GainAction,
 }

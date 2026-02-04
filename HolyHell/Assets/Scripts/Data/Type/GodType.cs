@@ -1,5 +1,10 @@
 public enum GodType
 {
-    Mortal,
+    None = default,
     Intereon,
+    Florentis,
+    Evinor,
+    Oculyth,
+    Hedalis,
+    Vortherect,
 }

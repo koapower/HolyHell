@@ -49,6 +49,10 @@ namespace HolyHell.Battle.Logic.Buffs
             // Override for effects that trigger at turn end
         }
 
+        // Called when the owner plays a card -- used by Swift to trigger adjacent cards
+        // Returns true if the buff handled the event and should be consumed (removed after)
+        public virtual bool OnCardPlayed(HolyHell.Battle.Effect.EffectContext context) => false;
+
         // Called when this buff is first applied
         public virtual void OnApplied() { }
 

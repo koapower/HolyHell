@@ -35,6 +35,10 @@ public class EnemyRow
     [Column("DomRes")]
     public int DominationResistance;
 
+    //AI Behavior
+    [Column("BehaviorID")]
+    public int BehaviorId;
+
     // Skills
     [Column("Skill1")]
     public string Skill1Name;

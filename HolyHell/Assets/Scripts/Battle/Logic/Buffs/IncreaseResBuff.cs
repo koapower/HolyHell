@@ -14,7 +14,7 @@ namespace HolyHell.Battle.Logic.Buffs
         private float resistancePercentage;
 
         public IncreaseResBuff(ElementType elementType, float resistancePercentage, int stackCount = 1, int duration = -1)
-            : base(BuffType.IncreaseRes.ToString(), stackCount, duration)
+            : base($"Increase{elementType}Resistance", stackCount, duration)
         {
             ElementType = elementType;
             this.resistancePercentage = resistancePercentage;

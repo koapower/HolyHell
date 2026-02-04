@@ -15,7 +15,7 @@ namespace HolyHell.Battle.Logic.Buffs
         public bool HasTriggered { get; set; }
 
         public LifesteelBuff(int duration = -1)
-            : base(BuffType.Lifesteel.ToString(), 1, duration)
+            : base(BuffType.LifeSteal.ToString(), 1, duration)
         {
             HasTriggered = false;
         }

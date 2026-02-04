@@ -21,21 +21,21 @@ public class MonsterSkillRow
     public CardEffectType Effect1Type;
 
     [Column("EffectAtr1")]
-    public float Effect1Value;
+    public string Effect1Value;
 
     // Effect 2
     [Column("Effect2")]
     public CardEffectType Effect2Type;
 
     [Column("EffectAtr2")]
-    public float Effect2Value;
+    public string Effect2Value;
 
     // Effect 3
     [Column("Effect3")]
     public CardEffectType Effect3Type;
 
     [Column("EffectAtr3")]
-    public float Effect3Value;
+    public string Effect3Value;
 
     // VFX
     [Column("VFX")]
@@ -68,21 +68,21 @@ public class MonsterSkillRow
         // Effect 1
         if (Effect1Type != CardEffectType.None)
         {
-            var effect = EffectFactory.CreateEffect(Effect1Type, Effect1Value.ToString());
+            var effect = EffectFactory.CreateEffect(Effect1Type, Effect1Value);
             if (effect != null) effectList.Add(effect);
         }
 
         // Effect 2
         if (Effect2Type != CardEffectType.None)
         {
-            var effect = EffectFactory.CreateEffect(Effect2Type, Effect2Value.ToString());
+            var effect = EffectFactory.CreateEffect(Effect2Type, Effect2Value);
             if (effect != null) effectList.Add(effect);
         }
 
         // Effect 3
         if (Effect3Type != CardEffectType.None)
         {
-            var effect = EffectFactory.CreateEffect(Effect3Type, Effect3Value.ToString());
+            var effect = EffectFactory.CreateEffect(Effect3Type, Effect3Value);
             if (effect != null) effectList.Add(effect);
         }
 
@@ -106,14 +106,14 @@ public class MonsterSkillRow
     /// <summary>
     /// Get effect value by index (1-3)
     /// </summary>
-    public float GetEffectValue(int index)
+    public string GetEffectValue(int index)
     {
         return index switch
         {
             1 => Effect1Value,
             2 => Effect2Value,
             3 => Effect3Value,
-            _ => 0f
+            _ => string.Empty
         };
     }
 }

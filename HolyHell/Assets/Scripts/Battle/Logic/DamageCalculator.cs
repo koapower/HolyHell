@@ -40,34 +40,57 @@ namespace HolyHell.Battle.Logic
         }
 
         /// <summary>
-        /// Apply element resistance from buffs
+        /// Apply element resistance from buffs.
+        /// Formula: finalDamage = baseDamage - allResValue - elementResValue
+        /// If elementType is None (untyped damage), no resistance is applied at all.
+        /// AllRes buffs apply to every typed damage; element-specific buffs only apply to their matching type.
         /// </summary>
         private static float ApplyElementResistance(float damage, BattleEntity defender, ElementType elementType)
         {
-            float resistanceModifier = 0f;
+            // Untyped damage bypasses all resistance
+            if (elementType == ElementType.None)
+            {
+                return damage;
+            }
 
-            // Check for IncreaseRes buffs (reduce damage)
-            var increaseResBuffs = defender.buffHandler.activeBuffs
+            float totalResistance = 0f;
+
+            // --- All-resistance buffs (apply to any typed damage) ---
+            var allIncRes = defender.buffHandler.activeBuffs
+                .OfType<IncreaseResBuff>()
+                .Where(b => b.ElementType == ElementType.All);
+            foreach (var buff in allIncRes)
+            {
+                totalResistance += buff.GetResistanceModifier();
+            }
+
+            var allDecRes = defender.buffHandler.activeBuffs
+                .OfType<ReduceResBuff>()
+                .Where(b => b.ElementType == ElementType.All);
+            foreach (var buff in allDecRes)
+            {
+                totalResistance -= buff.GetResistanceModifier();
+            }
+
+            // --- Element-specific resistance buffs ---
+            var elemIncRes = defender.buffHandler.activeBuffs
                 .OfType<IncreaseResBuff>()
                 .Where(b => b.ElementType == elementType);
-
-            foreach (var buff in increaseResBuffs)
+            foreach (var buff in elemIncRes)
             {
-                resistanceModifier -= buff.GetResistanceModifier();
+                totalResistance += buff.GetResistanceModifier();
             }
 
-            // Check for ReduceRes buffs (increase damage)
-            var reduceResBuffs = defender.buffHandler.activeBuffs
+            var elemDecRes = defender.buffHandler.activeBuffs
                 .OfType<ReduceResBuff>()
                 .Where(b => b.ElementType == elementType);
-
-            foreach (var buff in reduceResBuffs)
+            foreach (var buff in elemDecRes)
             {
-                resistanceModifier += buff.GetResistanceModifier();
+                totalResistance -= buff.GetResistanceModifier();
             }
 
-            // Apply resistance modifier
-            return damage * (1f + resistanceModifier);
+            // Subtract total resistance from damage (clamped to 0 by the caller)
+            return damage - totalResistance;
         }
 
         /// <summary>
@@ -110,7 +133,7 @@ namespace HolyHell.Battle.Logic
                 // Handle Lifesteel buff on attacker
                 if (attacker != null && attacker.buffHandler != null)
                 {
-                    var lifesteelBuff = attacker.buffHandler.GetBuff(BuffType.Lifesteel.ToString()) as LifesteelBuff;
+                    var lifesteelBuff = attacker.buffHandler.GetBuff(BuffType.LifeSteal.ToString()) as LifesteelBuff;
                     if (lifesteelBuff != null && !lifesteelBuff.HasTriggered)
                     {
                         ApplyHealing(attacker, damageInt);

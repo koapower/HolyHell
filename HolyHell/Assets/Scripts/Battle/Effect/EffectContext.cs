@@ -25,6 +25,11 @@ namespace HolyHell.Battle.Effect
         public bool KillOccurred { get; set; }
         public CardInstance CurrentCard { get; set; }
 
+        // SpendRepeatTheRest: the full effect list of the current card and the index of SpendRepeatTheRest within it
+        // SpendRepeatTheRestEffect uses these to know which effects come after it
+        public List<EffectBase> AllCardEffects { get; set; }
+        public int SpendRepeatIndex { get; set; } = -1;
+
         public EffectContext(
             BattleEntity caster,
             BattleEntity target = null,

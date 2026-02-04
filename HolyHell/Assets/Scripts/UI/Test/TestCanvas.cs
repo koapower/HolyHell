@@ -15,12 +15,11 @@ public class TestCanvas : MonoBehaviour, IUIInitializable
         {
             this.gameObject.SetActive(false);
             var testDeck = new List<string>();
-            for (global::System.Int32 i = 0; i < 3; i++)
+            var cardId = 610001;
+            for (global::System.Int32 i = 0; i < 8; i++)
             {
-                testDeck.Add("AngelBasic");
-                testDeck.Add("NeutAttack");
-                testDeck.Add("NeutDefence");
-                testDeck.Add("NeutAttack2");
+                testDeck.Add(cardId.ToString());
+                cardId++;
             }
             var testEnemies = new List<EnemySetupInfo>()
             {

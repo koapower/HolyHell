@@ -14,7 +14,7 @@ namespace HolyHell.Battle.Logic.Buffs
         private float resistanceReduction;
 
         public ReduceResBuff(ElementType elementType, float resistanceReduction, int stackCount = 1, int duration = -1)
-            : base(BuffType.ReduceRes.ToString(), stackCount, duration)
+            : base($"Decrease{elementType}Resistance", stackCount, duration)
         {
             ElementType = elementType;
             this.resistanceReduction = resistanceReduction;

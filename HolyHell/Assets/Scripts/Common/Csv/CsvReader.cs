@@ -25,6 +25,7 @@ public class CsvReader
     public static List<T> ReadFromString<T>(string str) where T : new()
     {
         var lines = Regex.Split(str, LINE_SPLIT_RE);
+        lines = MergeQuotedLines(lines);
         lines = FilterLines(lines);
         return ProcessLines<T>(lines);
     }
@@ -33,17 +34,71 @@ public class CsvReader
     {
         if (!File.Exists(file))
         {
-            throw new FileNotFoundException(Path.GetFileName(file) + " 不存在，请检查文件路径！\n文件路径：" + file);
+            throw new FileNotFoundException(Path.GetFileName(file) + " does not exist!, please check file path!\npath: " + file);
         }
 
         string tempFileName = Path.GetTempFileName();
         File.Copy(file, tempFileName, overwrite: true);
-        return File.ReadAllLines(tempFileName);
+        string[] rawLines = File.ReadAllLines(tempFileName);
+        return MergeQuotedLines(rawLines);
+    }
+
+    /// <summary>
+    /// Merges lines that are split inside quoted fields into a single logical line.
+    /// Per CSV spec, newlines within double quotes are valid characters and should not be treated as row separators.
+    /// Tracks quote state character-by-character to correctly handle multiple open/close pairs on the same line
+    /// (e.g. closing one quoted field and opening another: ...value","next...).
+    /// </summary>
+    private static string[] MergeQuotedLines(string[] rawLines)
+    {
+        List<string> merged = new List<string>();
+        StringBuilder current = null;
+        bool insideQuotes = false;
+
+        foreach (string line in rawLines)
+        {
+            if (current != null)
+            {
+                // Rejoin with \n to preserve the original newline within the quoted field
+                current.Append('\n');
+            }
+            else
+            {
+                current = new StringBuilder();
+            }
+
+            current.Append(line);
+
+            // Walk through the line character by character to track quote state
+            foreach (char c in line)
+            {
+                if (c == '"')
+                {
+                    insideQuotes = !insideQuotes;
+                }
+            }
+
+            if (!insideQuotes)
+            {
+                // All quotes are closed -> this is a complete logical line
+                merged.Add(current.ToString());
+                current = null;
+            }
+            // Otherwise, insideQuotes is still true -> keep accumulating the next line
+        }
+
+        // If there is still an unclosed field at the end, add it anyway to avoid data loss
+        if (current != null)
+        {
+            merged.Add(current.ToString());
+        }
+
+        return merged.ToArray();
     }
 
     private static string[] FilterLines(string[] lines)
     {
-        // 過濾掉空行與只有逗號或空格的行
+        // Filter out empty lines and lines containing only commas or whitespace
         string[] filteredLines = lines
             .Where(line => !string.IsNullOrWhiteSpace(line) && !Regex.IsMatch(line, @"^[,\s]*$"))
             .ToArray();
@@ -147,7 +202,7 @@ public class CsvReader
                 }
                 catch (Exception)
                 {
-                    throw new InvalidCastException(string.Format("{0}: 字段 {1} 指定的数据{2} 不是 {3} 类型，请修改csv中数据！", "CsvUtility", headers[i], stringValue, fieldInfo.FieldType));
+                    throw new InvalidCastException(string.Format("{0}: Column [{1}] Data [{2}] is not type of [{3}]，please correct the csv data!", "CsvUtility", headers[i], stringValue, fieldInfo.FieldType));
                 }
             }
         }

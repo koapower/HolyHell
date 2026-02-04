@@ -1,6 +1,56 @@
 ID,DisplayName,Type,Faction,Godhood,AvalueInc,DvalueInc,Rarity,ActionCost,Effect1,EffectAtr1,EffectReq1,Effect2,EffectAtr2,EffectReq2,Effect3,EffectAtr3,EffectReq3,Effect4,EffectAtr4,EffectReq4,VFX ID,Camera Type,Description
-AngelBasic,Holy Wrath,Bliss,Angel,Intereon,10,-10,1,1,SingleDamage,10,,SingleDamage,10,Ametervalue>=25,,,,,,,,,"Deals 10 {icon:Bliss} damage.
-Deals 20 when {icon:Angelmeter} >= 25% instead."
-NeutAttack,Soul Arrow,Enlightened,Neutral,,,,1,1,SingleDamage,4,,,,,,,,,,,,,Deals 4 {icon:type} damage.
-NeutDefence,Soul Barrier,Domination,Neutral,,,,1,1,SelfBuff,"Guard,1,1,1",,,,,,,,,,,,,Gain {keyword:Guard}
-NeutAttack2,Soul Barrage,Domination,Neutral,,,,2,2,SingleDamage,8,,AOEDamage,8,,,,,,,,,,"Deals 16 {icon:Domination} damage to one target, and 8 to others."
+610001,Soul Arrow,Enlightened,Neutral,,,,1,1,SingleDamage,6,,,,,,,,,,,,,Deals {Value:EffectVal1} {icon:type} damage.
+610002,Soul Barrier,Domination,Neutral,,,,1,1,SelfBuff,"Guard,1,1,1",,,,,,,,,,,,,Gain {keyword:Guard} for 1 turn.
+610003,Soul Barrage,Domination,Neutral,,,,2,2,SingleDamage,8,,AOEDamage,8,,,,,,,,,,"Deals 16 {icon:type} damage to one target, and 8 to others."
+610004,Dinemite Throw,Enlightened,Neutral,,,,1,1,AOEDamage,6,,,,,,,,,,,,,Deal {Value:EffectVal1} {icon:type} damage to all enemies.
+610005,GlassShard Toss,Ravenous,Neutral,,,,1,0,TargetAOEBuff,"Fragile,1,1,1",,,,,,,,,,,,,Apply {keyword:Fragile} to all enemies for 1 turn.
+610006,Sneak,Despair,Neutral,,,,1,1,SelfBuff,"IncreaseAllRes,5,1,1",,,,,,,,,,,,,Increase all resistance by 5 for 1 turn.
+610007,Nimble movement,Bliss,Neutral,,,,1,1,TargetSingleBuff,"ReduceAtk,5,1,1",,,,,,,,,,,,,Reduce target's attack by 15%.
+610008,Strike of Courage,Domination,Neutral,,-30,-30,1,2,SingleDamage,10,,,,,,,,,,,,,"Deal {Value:EffectVal1} damage. Reduce both meters by 30. "
+621001,Wrath,Bliss,Angel,Intereon,10,-10,2,1,SingleDamage,10,,SingleDamage,10,"Ametervalue>=,30",,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. Deal {Value:EffectVal2} extra {icon:type} damage if {Icon:Ameter} is >= 30. "
+621002,Radiant,Domination,Angel,Intereon,20,-10,1,1,SingleDamage,3,,SingleDamage,12,"Dmetervalue=<,40",,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. Deal {Value:EffectVal2} extra {icon:type} damage if {Icon:Dmeter} is =< 40. "
+621003,Divinition,Bliss,Angel,Intereon,10,-10,1,0,SelfFlatHeal,3,,SelfBuff,3,"IncreaseAllRes,3,1,1",,,,,,,,,Heal for {Value:EffectVal1}. Increase all res by 3.
+621004,Retribution,Enlightened,Angel,Intereon,10,-20,2,0,InstDraw,3,"Ametervalue>=,60
+Handsize <=,3",SelfPercHeal,3,"Ametervalue>=,60
+Handsize <=,3",,,,,,,,,"If {Icon:Ameter} is >= 60 and your handsize is below 3, draw {Value:EffectVal1} cards and heal yourself for 30%."
+621005,Decend,Domination,Angel,Intereon,-40,0,3,5,AOEDamage,50,,SelfFlatHeal,12,,ReduceCost,2,"Ametervalue>=,80",,,,,,"Deal {Value:EffectVal1} {icon:type} damage to all enemies and heal for {Value:EffectVal2}. If {icon:Ameter} is >= 80, reduce action cost by {Value:EffectVal3}."
+621006,Unbreakable,Despair,Angel,Intereon,10,-10,1,2,SingleDamage,12,,SelfBuff,"Guard,1,1,1",,TargetSingleBuff,"DecreaseDomRes,8,1,2","Ametervalue>=,40",,,,,,"Deal {Value:EffectVal1} {icon:type} damage and gain guard for 1 turn. If {icon:Ameter} is >= 40, reduce all enemies' {icon:domination} res by 8 for 2 turns."
+621007,Purification,Domination,Angel,Intereon,0,0,2,2,SingleDamage,20,"Dmetervalue>=,60",DvalueDec,30,"Dmetervalue>=,60",CleanseSelf,,,,,,,,"Cleanse all of your debuffs. If {icon:Dmeter} is >= 60, reduce it by 30 and deal {Value:EffectVal3} {icon:type} extra damage."
+622001,Sunlight,Bliss,Angel,Florentis,10,-10,1,1,SelfFlatHeal,6,,SelfFlatHeal,6,"SelfHP<=,20",,,,,,,,,"Heal yourself for {Value:EffectVal1}. If HP is below 20, heal extra {Value:EffectVal2}."
+622002,Scorching Love,Domination,Angel,Florentis,10,-10,1,1,SingleDamage,3,,SelfBuff,"Blessed,10,1,2",,,,,,,,,,Deal {Value:EffectVal1} {icon:type} damage. Gain 10% {Keyworld:Blessed} for 2 turns.
+622003,Warm Embrace,Enlightened,Angel,Florentis,20,-10,2,2,SelfBuff,"Guard,1,1,1",,SelfBuff,"Blessed,10,1,2",,SelfFlatHeal,10,"SelfHP<=,10",,,,,,"Gain {keyword:Guard}. Gain 10% {keyword:Blessed} for 2 turn. If HP is below 10, heal {Value:EffectVal3}."
+622004,Soul Scorch,Ravenous,Angel,Florentis,10,-10,1,1,TargetAOEBuff,"Fragile,1,1,2","Ametervalue>=,60",TargetAOEBuff,"Feared,1,1,2",,,,,,,,,,"Apply {keyword:Feared} to all enemies for 1 turn. If {icon:Ameter} >=60, apply {keyword:Fragile} as well."
+622005,Reinvigorate,Bliss,Angel,Florentis,10,-10,2,2,TargetAOEBuff,"Bleeding,1,2,100",,SelfFlatHeal,35,"Ametervalue>=,50",,,,,,,,,"Apply 2 stacks of {keyword:Bleed} to all enemies. If angel meter is >= 50, heal for {Value:EffectVal2}."
+622006,Vine gash,Domination,Angel,Florentis,20,-20,1,1,SingleDamage,8,,SingleDamage,4,"BuffApplied,Bleed",ReduceCost,1,"BuffApplied,Bleed",,,,,,"Deal {Value:EffectVal1} {icon:type} damage. If the target is bleeding, reduce this card's cost by 1 and deal {Value:EffectVal2} extra {icon:type} damage."
+622007,Branch burst,Despair,Angel,Florentis,10,-10,1,1,TargetSingleBuff,"DecreaseBliRes,5,1,3",,SingleDamage,8,"Dmetervalue<=,30",TargetSingleBuff,"Bleeding,1,1,100","Dmetervalue<=,30",,,,,,"Redce one target's bliss res by 5. If {icon:Dmeter} is =< 30, deal {Value:EffectVal1} extra {icon:type} damage and apply 1 stack of {keyword:Bleed}."
+623001,Inner Struggle,Enlightened,Angel,Evinor,50,50,1,1
+623002,Titanic Slam,Domination,Angel,Evinor,10,-10,1,1,SelfBuff,"IncreaseDmg,20,1,1","Ametervalue>=,30",AOEDamage,8,,,,,,,,,,"Deal {Value:EffectVal2} {icon:type} damage to all enemies. If {icon:Ameter} is >= 30, gain 20% damage Increase beforehand that last for a turn. "
+623003,Crushing Fist,Domination,Angel,Evinor,10,-10,1,1,SingleDamage,20,,SelfBuff,"Fragile,1,1,1",,AvalueDec,30,"Ametervalue>=,30",CleanseSelf,,"Ametervalue>=,30",,,Deal {Value:EffectVal1} {icon:type} damage and gain {icon:Fragile}. Spend 30 {icon:Ameter} to cleanse all debuffs if possible.
+623004,Deadbeating,Despair,Angel,Evinor,10,-10,1,1,SingleDamage,8,,SingleDamage,6,Nokill,,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. If the target is alive, deal {Value:EffectVal2} {icon:type} more."
+623005,Manifestation,Enlightened,Angel,Evinor,20,-10,3,2,SelfBuff,"Gifted,1,1,3",,SelfBuff,"IncreaseAllRes,3,1,3","Dmetervalue<=,40",,,,,,,,,"Gain {icon:Gifted} for the next 3 turns. If {icon:Dmeter} is =< 40, also increase all of your resistance by 3."
+623006,MountainShaping,Ravenous,Angel,Evinor,10,-10,2,0,SelfBuff,"BoostDmg,3,1,1",,SpendRepeatTheRest,"ActionPoint,1,3",,SingleDamage,10,,,,,,,Gain 3 flat damage. Can spend up to 3 action points to deal {Value:EffectVal3} {icon:type} damage each.
+623007,Fed from the bosom,Despair,Angel,Evinor,10,-10,1,2,SelfFlatHeal,12,,SpendRepeatTheRest,"Ameter,10,30",,SelfFlatHeal,6,,,,,,,Heal for {Value:EffectVal1}. Can spend up to 30 {icon:Ameter} to heal 6 per 10 meter spent.
+623008,Golden Sparkle,Enlightened,Angel,Evinor,10,-10,2,2,AOEDamage,18,,SpendRepeatTheRest,"Dmeter,10,10",,AOEDamage,18,,,,,,,Deal {Value:EffectVal1} {icon:type} damage to all enemies. Can spend 30 {icon:Dmeter} to repeat once.
+631001,Truth Piercer,Despair,Demon,Oculyth,-10,10,1,1,SingleDamage,8,,ReduceCost,1,"Ameter<=,40",,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. If {icon:Ameter} is <= 40, reduce this card's cost by 1."
+631002,Counting Doom,Despair,Demon,Oculyth,-10,30,1,1,DelayAOEDamage,"18,2",,,,,,,,,,,,,Deal {Value:EffectVal1} {icon:type} AOE damage after 2 turns.
+631003,Foresight,Enlightened,Demon,Oculyth,-10,10,2,0,InstDraw,1,,DelayAOEDamage,6,,,,,,,,,,"Draw {Value:EffectVal1} card, deal {Value:EffectVal2} {icon:type} damage to all enemies next turn."
+631004,Sweet Dreams,Domination,Demon,Oculyth,-10,10,1,1,SelfFlatHeal,12,,CleanseSelf,,"Ameter>=,50
+Dmeter>=,50",,,,,,,,,"Heal for {Value:EffectVal1}. If your {icon:Ameter} and {icon:Dmeter} are both >= 50, cleanse all of your debuffs."
+631005,Astral Insight,Enlightened,Demon,Oculyth,-10,10,1,1,SingleDamage,6,,InstDraw,1,,SelfBuff,"ReqChange,1","Dmeter<=,40",,,,,,"Deal {Value:EffectVal1} {icon:type} damage and draw 1 card. If your {icon:Dmeter} is <=40, reduce your next card's cost by 1."
+631006,Mind Eater,Despair,Demon,Oculyth,10,10,2,2,DelayAOEDamage,"12,1",,SelfBuff,"Blessed,10,1,2",,,,,,,,,,Deal {Value:EffectVal1} {icon:type} damage to all enemies after 1 turn. Gain 10%{keyword:blessed} for 2 turns.
+631007,Essence Drain,Despair,Demon,Oculyth,-10,10,1,0,SingleDamage,5,,ReduceCost,3,Onkill,,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. If the target is killed, reduce your next played card by {Value:EffectVal2}."
+632001,Rapid thoughts,Enlightened,Demon,Hedalis,-10,-10,1,2,SelfBuff,"Swift,L1R1,1,1",,,,,,,,,,,,,Gain {keyword:Swift} LR+1 for your next card.
+632002,Vicious unleash,Ravenous,Demon,Hedalis,-10,40,1,1,SingleDamage,4,,SingleDamage,4,,SingleDamage,8,"Dmeter>=,50",,,,,,"Deal {Value:EffectVal1} {icon:type} damage to one target 2 times. If {icon:Dmeter} is >= 50, deal an extra {Value:EffectVal3} {icon:type} damage."
+632003,Unburden,Bliss,Demon,Hedalis,-20,20,1,1,SelfBuff,"BoostDmg,4,1,2","Dmeter>=,60",SelfBuff,"BoostDmg,4,1,1",,,,,,,,,,"Gain {Value:EffectVal1} {icon:type} flat damage boost for this turn. If {icon:Dmeter} is >= 60, gain it next turn as well."
+632004,Free thinking,Enlightened,Demon,Hedalis,-10,30,1,0,InstDraw,1,,SelfBuff,"BoostDmg,2,1,1",,GainAction,1,,SelfBuff,"Cursed,1,1,1",,,,"Draw {Value:EffectVal1} card, gain {Value:EffectVal2} added damage and {Value:EffectVal3} action point. Apply {keyword:Cursed} to yourself for 1 turn."
+632005,Unchained,Domination,Demon,Hedalis,-10,10,1,2,SelfBuff,"Swift,R1,1,1",,SingleDamage,6,,TargetSingleBuff,"Feared,20,1,1",,,,,,,{keyword:Swift} R+1. Deal {Value:EffectVal1} {icon:type} damage and apply 20% {keyword:Feared} to the target.
+632006,Endless desire,Ravenous,Demon,Hedalis,-10,20,1,2,TargetAOEBuff,"Cursed,1,1,1",,AOEDamage,28,"Ametervalue<=,50
+Dmetervalue>=,50",,,,,,,,,"Apply {keyword:Cursed} to all enemies and gain lifesteal. If {icon:Ameter} is =< 50 and {icon:Dmeter} is >= 50, deal {Value:EffectVal2} {icon:type} extra damage."
+632007,Through the Lens,Enlightened,Demon,Hedalis,-10,40,3,3,SingleDamage,6,,SpendRepeatTheRest,"Dmeter,5,100",,SingleDamage,6,,,,,,,Deal {Value:EffectVal1} {icon:type} damage to a target. Can be repeatedly casted by spending 5 {icon:Dmeter} with no limits.
+633001,Bite of Starvation,Ravenous,Demon,Vortherect,-10,20,1,1,SingleDamage,8,,SelfBuff,"LifeSteal,1,1,1",Onkill,,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damage. If the target is killed by this card, gain {keyword:Lifesteal} on your next damage this turn ."
+633002,Hunger Drive,Domination,Demon,Vortherect,-10,10,1,1,SingleDamage,4,,SelfBuff,"LifeSteal,1,1,2",,,,,,,,,,Deal {Value:EffectVal1} {icon:type} damage. Gain {keyword:Lifesteal} on your first damage in the next 2 turns.
+633003,Harvest,Ravenous,Demon,Vortherect,-10,20,2,3,SelfBuff,"LifeSteal,1,1,1",,AOEDamage,12,,GainAction,1,Onkill,,,,,,"keyword:{Lifesteal}. Deal {Value:EffectVal1} {icon:type} damage to all enemies. If any enemies died, gain 1 action point."
+633004,Bloodbath,Domination,Demon,Vortherect,-10,10,1,1,SelfDamage,6,,TargetSingleBuff,"Bleeding,1,2,100",,,,,,,,,,Deal {Value:EffectVal1} damage to yourself. Apply bleed to all enemies for 2 turns.
+633005,Bloodlust,Enlightened,Demon,Vortherect,-10,10,1,2,SelfBuff,"IncreaseDmg,50,1,2",Dmetervalue>=50,AOEDamage,8,,,,,,,,,,"Deal {Value:EffectVal1} {icon:type} damge to all enemies. If {icon:Dmeter} is >= 20, gain 50% inc damage for 2 turns. "
+633006,Order rupture,Bliss,Demon,Vortherect,-10,30,3,2,SelfDamage,10,Ametervalue<=30,TargetAOEBuff,"Bleeding,1,1,100",Ametervalue<=30,TargetAOEBuff,"Feared,20,1,2",Ametervalue<=30,TargetAOEBuff,"Cursed,1,1,2","Ametervalue<=,30",,,"If {icon:Ameter} is <= 30, deal {Value:EffectVal1} damage to yourself and apply {keyword:Bleed}, 20% {keyword:Feared}, and {keyword:Cursed} to all enemies for 2 turns."
+633007,Spread of Dread,Ravenous,Demon,Vortherect,-10,40,2,3,TargetAOEBuff,"Feared,40,1,2",,SelfBuff,"IncreaseDmg,60,1,1",,SelfBuff,"LifeSteal,1,1,1",,ReduceCost,2,"Dmetervalue>=,80",,,"Apply 40% {keyword:Feared} to all enemies. Gain 60% damage increase for a turn, and {keyword:Lifesteal} for your next damage. If {icon:Dmeter} is >=80, this card costs 0."
