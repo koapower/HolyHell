@@ -61,6 +61,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     private bool isPlayable = true;
     private bool isHovered = false;
     private bool isSelected = false;
+    private bool canInteract = true;
     private Vector3 originalScale;
     private Vector2 originalAnchoredPosition;
     private IDisposable _delayLongTapSubscription;
@@ -235,6 +236,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public void SetCardInteractability(bool canInteract)
     {
         // default is true
+        this.canInteract = canInteract;
         canvasGroup.blocksRaycasts = canInteract;
         canvasGroup.interactable = canInteract;
     }
@@ -259,6 +261,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     private void Update()
     {
+        if (!canInteract) return;
+
         // Handle state machine updates
         UpdateStateMachine();
 
@@ -380,6 +384,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         _delayLongTapSubscription?.Dispose();
         _delayLongTapSubscription = null;
+        if (battleManager != null && battleManager.currentPreviewCard != null)
+            battleManager.currentPreviewCard.Value = null;
     }
 
     private void ShowUseButton(bool show)
@@ -417,6 +423,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
+        // only accept left click
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
         // Click is only processed if we didn't drag
         if (hasMovedOutOfHandUI)
         {
@@ -455,6 +464,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public void OnPointerDown(PointerEventData eventData)
     {
         if (!isPlayable) return;
+        // only accept left click
+        if (eventData.button != PointerEventData.InputButton.Left) return;
 
         currentState = CardInteractionState.Pressing;
 
