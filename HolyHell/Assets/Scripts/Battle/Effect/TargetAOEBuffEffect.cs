@@ -16,17 +16,19 @@ namespace HolyHell.Battle.Effect
             var buffDef = EffectValueParser.ParseBuffDefinition(Value);
 
             var targets = context.GetAliveEnemies();
-            Debug.Log($"alive enemy count {targets.Count}");
+
+            var appliedCounter = 0;
             foreach (var enemy in targets)
             {
                 var buff = BuffFactory.CreateBuffFromId(buffDef.Id, buffDef.Parameter, buffDef.StackCount, buffDef.Duration);
                 if (buff != null)
                 {
                     enemy.buffHandler.AddBuff(buff);
+                    appliedCounter++;
                 }
             }
 
-            Debug.Log($"Applied {buffDef.Id} buff to all enemies");
+            Debug.Log($"Applied {buffDef.Id} buff to {appliedCounter} enemies");
             return false;
         }
 
