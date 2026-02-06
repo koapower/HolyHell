@@ -4,6 +4,7 @@ using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
 using HolyHell.UI.Battle;
 using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,6 +24,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
 
     [Header("Enemy UI")]
     [SerializeField] private EnemyListUI enemyListUI;
+    [SerializeField] private TextMeshProUGUI enemySkillDescriptionText;
 
     [Header("Battle Flow UI")]
     [SerializeField] private TurnIndicatorUI turnIndicatorUI;
