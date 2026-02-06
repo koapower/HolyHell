@@ -10,7 +10,7 @@ namespace HolyHell.Battle.Entity
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private BoxCollider2D boxCollider2D;
 
-        // Enemy data reference
+        private IBattleManager battleManager;
         public EnemyRow enemyData;
 
         // Current intent (what the enemy will do next turn)
@@ -29,8 +29,9 @@ namespace HolyHell.Battle.Entity
         private bool isInSelectionMode = false; // Whether selection mode is active globally
         private bool isHovered = false;
 
-        public void Initialize(EnemyRow data, List<EnemySkill> skills)
+        public void Initialize(IBattleManager battleManager, EnemyRow data, List<EnemySkill> skills)
         {
+            this.battleManager = battleManager;
             enemyData = data;
             availableSkills = skills;
 
@@ -40,7 +41,7 @@ namespace HolyHell.Battle.Entity
             shield.Value = 0;
 
             // Initialize AI
-            ai = new EnemyAI(this);
+            ai = new EnemyAI(battleManager, this);
 
             // Get references
             if (spriteRenderer == null)

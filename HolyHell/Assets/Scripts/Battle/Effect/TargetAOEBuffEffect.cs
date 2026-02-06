@@ -16,6 +16,7 @@ namespace HolyHell.Battle.Effect
             var buffDef = EffectValueParser.ParseBuffDefinition(Value);
 
             var targets = context.GetAliveEnemies();
+            Debug.Log($"alive enemy count {targets.Count}");
             foreach (var enemy in targets)
             {
                 var buff = BuffFactory.CreateBuffFromId(buffDef.Id, buffDef.Parameter, buffDef.StackCount, buffDef.Duration);

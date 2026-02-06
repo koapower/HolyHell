@@ -16,7 +16,10 @@ namespace HolyHell.Battle
     {
         // Battle entities
         public PlayerEntity player;
+        public List<BattleEntity> allies = new List<BattleEntity>();
         public List<EnemyEntity> enemies = new List<EnemyEntity>();
+        public IReadOnlyList<BattleEntity> Allies => allies;
+        public IReadOnlyList<EnemyEntity> Enemies => enemies;
 
         // Systems
         public TurnSystem turnSystem;
@@ -71,7 +74,7 @@ namespace HolyHell.Battle
             turnSystem = new TurnSystem(this, player, enemies);
 
             // Create card executor
-            cardEffectExecutor = new CardEffectExecutor(player);
+            cardEffectExecutor = new CardEffectExecutor(this, player);
 
             // Set initial enemy intents
             foreach (var enemy in enemies)
@@ -158,7 +161,7 @@ namespace HolyHell.Battle
                 }
 
                 // Initialize enemy
-                enemy.Initialize(enemyData, skills);
+                enemy.Initialize(this, enemyData, skills);
 
                 enemies.Add(enemy);
                 enemyIndex++;

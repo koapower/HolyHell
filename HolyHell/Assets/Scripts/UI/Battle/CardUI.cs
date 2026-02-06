@@ -326,7 +326,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         // Move to end of parent to render on top (or move to HandUI if needed)
         transform.SetAsLastSibling();
 
-        Debug.Log($"Entered dragging state for card: {card.DisplayName}");
+        //Debug.Log($"Entered dragging state for card: {card.DisplayName}");
     }
 
     private void ExitDraggingState()
@@ -349,7 +349,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         // Update BattleManager state
         battleManager.cardInteractionState.Value = CardInteractionState.Idle;
 
-        Debug.Log($"Exited dragging state for card: {card.DisplayName}");
+        //Debug.Log($"Exited dragging state for card: {card.DisplayName}");
     }
 
     private void UpdateDragPosition()
@@ -539,7 +539,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (!requiresTarget)
         {
             // No target required - play card immediately
-            Debug.Log($"Playing card without target via drag: {card.DisplayName}");
+            //Debug.Log($"Playing card without target via drag: {card.DisplayName}");
             bool success = battleManager.PlayCard(card, null);
             ExitDraggingState();
         }

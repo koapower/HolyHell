@@ -47,7 +47,7 @@ namespace HolyHell.UI.Battle
             battleManager.cardInteractionState
                 .Subscribe(state =>
                 {
-                    Debug.Log($"CardDragHandler: Card interaction state changed to {state}");
+                    //Debug.Log($"CardDragHandler: Card interaction state changed to {state}");
                     if (state == CardInteractionState.Dragging && battleManager.currentSelectedCard.Value != null)
                     {
                         OnStartDrag(battleManager.currentSelectedCard.Value);

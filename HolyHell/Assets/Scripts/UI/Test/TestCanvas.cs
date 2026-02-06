@@ -16,7 +16,7 @@ public class TestCanvas : MonoBehaviour, IUIInitializable
             this.gameObject.SetActive(false);
             var testDeck = new List<string>();
             var cardId = 610001;
-            for (global::System.Int32 i = 0; i < 8; i++)
+            for (global::System.Int32 i = 0; i < 5; i++)
             {
                 testDeck.Add(cardId.ToString());
                 cardId++;

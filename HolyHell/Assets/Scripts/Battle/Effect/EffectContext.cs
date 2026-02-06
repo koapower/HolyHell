@@ -14,10 +14,9 @@ namespace HolyHell.Battle.Effect
         // Entities
         public BattleEntity Caster { get; set; }
         public BattleEntity Target { get; set; }
-        public List<BattleEntity> AllEnemies { get; set; }
-        public List<BattleEntity> AllAllies { get; set; }
 
         // Managers
+        public IBattleManager BattleManager { get; set; }
         public CardDeckManager DeckManager { get; set; }
         public DelayedEffectQueue DelayedEffectQueue { get; set; }
 
@@ -31,17 +30,17 @@ namespace HolyHell.Battle.Effect
         public int SpendRepeatIndex { get; set; } = -1;
 
         public EffectContext(
+            IBattleManager battleManager,
             BattleEntity caster,
             BattleEntity target = null,
             CardDeckManager deckManager = null,
             DelayedEffectQueue delayedQueue = null)
         {
+            BattleManager = battleManager;
             Caster = caster;
             Target = target;
             DeckManager = deckManager;
             DelayedEffectQueue = delayedQueue;
-            AllEnemies = new List<BattleEntity>();
-            AllAllies = new List<BattleEntity>();
             KillOccurred = false;
         }
 
@@ -51,7 +50,7 @@ namespace HolyHell.Battle.Effect
         public List<BattleEntity> GetAliveEnemies()
         {
             var result = new List<BattleEntity>();
-            foreach (var enemy in AllEnemies)
+            foreach (var enemy in BattleManager.Enemies)
             {
                 if (enemy != null && enemy.hp.CurrentValue > 0)
                 {
@@ -67,7 +66,7 @@ namespace HolyHell.Battle.Effect
         public List<BattleEntity> GetAliveAllies()
         {
             var result = new List<BattleEntity>();
-            foreach (var ally in AllAllies)
+            foreach (var ally in BattleManager.Allies)
             {
                 if (ally != null && ally.hp.CurrentValue > 0)
                 {

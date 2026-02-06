@@ -90,7 +90,7 @@ public class BattleUI : MonoBehaviour, IUIInitializable
     /// </summary>
     private void OnCardInteractionStateChanged(CardInteractionState state)
     {
-        Debug.Log($"BattleUI: Card interaction state changed to {state}");
+        //Debug.Log($"BattleUI: Card interaction state changed to {state}");
 
         switch (state)
         {

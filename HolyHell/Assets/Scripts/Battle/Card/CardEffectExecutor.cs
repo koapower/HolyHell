@@ -8,7 +8,6 @@ namespace HolyHell.Battle.Card
 {
     /// <summary>
     /// Executes card effects on targets
-    /// Simplified version using Effect classes
     /// </summary>
     public class CardEffectExecutor
     {
@@ -17,6 +16,7 @@ namespace HolyHell.Battle.Card
         private EffectContext context;
 
         public CardEffectExecutor(
+            IBattleManager manager,
             BattleEntity caster,
             CardDeckManager deckManager = null,
             DelayedEffectQueue delayedQueue = null)
@@ -25,16 +25,7 @@ namespace HolyHell.Battle.Card
             requirementEvaluator = new EffectRequirementEvaluator(caster as PlayerEntity);
 
             // Initialize context
-            context = new EffectContext(caster, null, deckManager, delayedQueue);
-        }
-
-        /// <summary>
-        /// Update context with enemy and ally lists
-        /// </summary>
-        public void UpdateBattleLists(List<BattleEntity> enemies, List<BattleEntity> allies = null)
-        {
-            context.AllEnemies = enemies ?? new List<BattleEntity>();
-            context.AllAllies = allies ?? new List<BattleEntity>();
+            context = new EffectContext(manager, caster, null, deckManager, delayedQueue);
         }
 
         /// <summary>

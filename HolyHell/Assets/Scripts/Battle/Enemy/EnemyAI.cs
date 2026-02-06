@@ -15,18 +15,10 @@ namespace HolyHell.Battle.Enemy
         private EnemyEntity enemy;
         private CardEffectExecutor effectExecutor;
 
-        public EnemyAI(EnemyEntity owner)
+        public EnemyAI(IBattleManager battleManager, EnemyEntity owner)
         {
             enemy = owner;
-            effectExecutor = new CardEffectExecutor(owner);
-        }
-
-        /// <summary>
-        /// Update battle context (should be called at battle start and when entities change)
-        /// </summary>
-        public void UpdateBattleContext(List<BattleEntity> enemies, List<BattleEntity> allies)
-        {
-            effectExecutor.UpdateBattleLists(enemies, allies);
+            effectExecutor = new CardEffectExecutor(battleManager, owner);
         }
 
         /// <summary>
