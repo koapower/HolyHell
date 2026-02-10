@@ -122,53 +122,60 @@ namespace HolyHell.Battle
         }
 
         /// <summary>
-        /// Initialize enemy entities from enemy IDs
+        /// Initialize enemy entities from enemy setup infos.
+        /// Skills are loaded from EnemyBehavior.csv (referenced by EnemyRow.BehaviorId).
         /// </summary>
         private async UniTask InitializeEnemies(List<EnemySetupInfo> enemyInfos)
         {
-            var enemyTable = tableManager.GetTable<EnemyRow>();
-            var skillTable = tableManager.GetTable<MonsterSkillRow>();
+            var enemyTable    = tableManager.GetTable<EnemyRow>();
+            var behaviorTable = tableManager.GetTable<EnemyBehaviorRow>();
+            var skillTable    = tableManager.GetTable<MonsterSkillRow>();
 
-            int enemyIndex = 0;
             foreach (var enemyInfo in enemyInfos)
             {
                 var enemyData = enemyTable.GetRow(e => e.Id == enemyInfo.Id);
                 if (enemyData == null)
                 {
-                    Debug.LogError($"Enemy data not found: {enemyInfo.Id}");
+                    Debug.LogError($"[Battle] Enemy data not found for ID: {enemyInfo.Id}");
                     continue;
                 }
 
-                // Create enemy GameObject
+                // Look up behavior row
+                var behaviorRow = behaviorTable.GetRow(b => b.Id == enemyData.BehaviorId);
+                if (behaviorRow == null)
+                    Debug.LogError($"[Battle] EnemyBehavior row not found: BehaviorID={enemyData.BehaviorId} (enemy: {enemyData.DisplayName})");
+
+                // Resolve skills from behavior row (up to 6 slots)
+                var skills = new List<EnemySkill>();
+                if (behaviorRow != null)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        var (skillId, _) = behaviorRow.GetSkillEntry(i);
+                        if (string.IsNullOrEmpty(skillId)) continue;
+
+                        var skillRow = skillTable.GetRow(s => s.Id == skillId);
+                        if (skillRow != null)
+                            skills.Add(new EnemySkill(skillId, skillRow));
+                        else
+                            Debug.LogWarning($"[Battle] MonsterSkill not found: '{skillId}' (enemy: {enemyData.DisplayName}, slot {i})");
+                    }
+                }
+
+                // Instantiate enemy prefab
                 var enemyGO = await assetLoader.InstaniateAsync("Res:/Characters/EnemyEntity.prefab", null);
                 enemyGO.name = $"Enemy_{enemyData.DisplayName}";
                 enemyGO.transform.position = enemyInfo.worldPosition;
                 var enemy = enemyGO.GetComponent<EnemyEntity>();
 
-                // Load skills
-                var skills = new List<EnemySkill>();
-                for (int i = 1; i <= 3; i++)
-                {
-                    var tuple = enemyData.GetSkillByIndex(i);
-                    if (!string.IsNullOrEmpty(tuple.skillName))
-                    {
-                        var skill = skillTable.GetRow(s => s.Id == tuple.skillName.Trim());
-                        if (skill != null)
-                        {
-                            skills.Add(new EnemySkill(tuple.stringReq.Trim(), skill));
-                        }
-                    }
-                }
-
-                // Initialize enemy
-                enemy.Initialize(this, enemyData, skills);
+                // Initialize with behavior and skills
+                enemy.Initialize(this, enemyData, behaviorRow, skills);
 
                 enemies.Add(enemy);
-                enemyIndex++;
-                Debug.Log($"Enemy initialized: {enemyData.DisplayName}, HP={enemy.hp.Value}, Skills={skills.Count}");
+                Debug.Log($"[Battle] Enemy ready: {enemyData.DisplayName} | HP={enemy.hp.Value} | BehaviorID={enemyData.BehaviorId} | Skills={skills.Count}");
             }
 
-            await UniTask.Yield(); // Ensure async
+            await UniTask.Yield();
         }
 
         /// <summary>

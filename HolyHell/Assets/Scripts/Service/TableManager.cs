@@ -13,6 +13,7 @@ public class TableManager : ITableManager
         Register(new Table<CardRow>(), new[] { "Res:/Tables/Card.csv" });
         Register(new Table<MonsterSkillRow>(), new[] { "Res:/Tables/MonsterSkill.csv" });
         Register(new Table<EnemyRow>(), new[] { "Res:/Tables/Enemy.csv" });
+        Register(new Table<EnemyBehaviorRow>(), new[] { "Res:/Tables/EnemyBehavior.csv" });
 
         await UniTask.CompletedTask;
     }

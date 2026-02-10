@@ -1,0 +1,7 @@
+ID,Skill1,Skill2,Skill3,Skill4,Skill5,Skill6,Condition1,Result1,Condition2,Result2,Condition3,Result3,Condition4,Result4
+710001,"BliSingleTar1,70","LowHeal1,15",,,,,"SelfHP<=,50","Skill2,50"
+710002,"DomSingleTar1,45","WasteTurn,30","DomSingleTar2,5",,,,"SelfHP>=,85","Skill2,50","SelfBuffCount>=,1","Skill3,30"
+710003,"FearDebuff1,10","DesSingleTar1,60","StealBuff1,10",,,,"SelfHP<=,30","Skill3,25","SelfHP>=,80","Skill1,45","SelfHP<=,30","Skill1,0"
+710004,"WasteTurn2,90","CardSteal1,5"
+710005,"DelayDes1,45","DemonResBuff1,20","RavSingleTar1,10","DesResDebuff1,20","DomSingleTar3,10",,"SelfHP<=,40","Skill3,60","TargetBuffCount>=,2","Skill1,60","TargetHP<=,40","Skill5,60"
+710006,"BliSingleTar1,40","GuardBuff1,20","LowHeal1,5","BliSingleTar2,5","AngelResBuff1,20",,"NoBuff,Guard","Skill2,60","SelfHP<=,30","Skill3,30","Turnpassed,5","Skill4,10","Turnpassed,10","Skill4,20"

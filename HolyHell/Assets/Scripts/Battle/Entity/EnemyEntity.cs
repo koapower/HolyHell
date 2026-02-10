@@ -12,11 +12,12 @@ namespace HolyHell.Battle.Entity
 
         private IBattleManager battleManager;
         public EnemyRow enemyData;
+        public EnemyBehaviorRow behaviorRow;
 
         // Current intent (what the enemy will do next turn)
         public ReactiveProperty<EnemySkill> currentIntent = new ReactiveProperty<EnemySkill>();
 
-        // Available skills
+        // Available skills (flat list kept for UI / fallback use)
         public List<EnemySkill> availableSkills = new List<EnemySkill>();
 
         // AI reference
@@ -29,10 +30,11 @@ namespace HolyHell.Battle.Entity
         private bool isInSelectionMode = false; // Whether selection mode is active globally
         private bool isHovered = false;
 
-        public void Initialize(IBattleManager battleManager, EnemyRow data, List<EnemySkill> skills)
+        public void Initialize(IBattleManager battleManager, EnemyRow data, EnemyBehaviorRow behavior, List<EnemySkill> skills)
         {
             this.battleManager = battleManager;
             enemyData = data;
+            behaviorRow = behavior;
             availableSkills = skills;
 
             // Set initial stats
@@ -42,6 +44,10 @@ namespace HolyHell.Battle.Entity
 
             // Initialize AI
             ai = new EnemyAI(battleManager, this);
+
+            // Cache skill slots for weighted selection
+            if (behavior != null)
+                ai.CacheSkillSlots(behavior, skills);
 
             // Get references
             if (spriteRenderer == null)

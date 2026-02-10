@@ -1,9 +1,7 @@
-using System.Collections.Generic;
-
-
 /// <summary>
-/// Enemy data from Enemy.csv
-/// CSV headers: ID, DisplayName, HP, BaseAtk, Des, Enl, Bli, Rav, Dom, Skill
+/// Enemy static data from Enemy.csv
+/// CSV headers: ID, DisplayName, HP, BaseAtk, DesRes, EnlRes, BliRes, RavRes, DomRes, BehaviorID
+/// Skills and AI behavior are defined separately in EnemyBehavior.csv (referenced by BehaviorID).
 /// </summary>
 public class EnemyRow
 {
@@ -19,7 +17,7 @@ public class EnemyRow
     [Column("BaseAtk")]
     public int BaseAtk;
 
-    // Resistances (element damage reduction percentages)
+    // Elemental resistances (damage reduction factor; higher = more resistant)
     [Column("DesRes")]
     public int DespairResistance;
 
@@ -35,34 +33,7 @@ public class EnemyRow
     [Column("DomRes")]
     public int DominationResistance;
 
-    //AI Behavior
+    /// <summary>Reference to the EnemyBehavior.csv row that defines this enemy's AI logic.</summary>
     [Column("BehaviorID")]
     public int BehaviorId;
-
-    // Skills
-    [Column("Skill1")]
-    public string Skill1Name;
-    [Column("SkillReq1")]
-    public string Skill1Requirement;
-
-    [Column("Skill2")]
-    public string Skill2Name;
-    [Column("SkillReq2")]
-    public string Skill2Requirement;
-
-    [Column("Skill3")]
-    public string Skill3Name;
-    [Column("SkillReq3")]
-    public string Skill3Requirement;
-
-    public (string skillName, string stringReq) GetSkillByIndex(int index)
-    {
-        return index switch
-        {
-            1 => (Skill1Name, Skill1Requirement),
-            2 => (Skill2Name, Skill2Requirement),
-            3 => (Skill3Name, Skill3Requirement),
-            _ => (null, null),
-        };
-    }
 }

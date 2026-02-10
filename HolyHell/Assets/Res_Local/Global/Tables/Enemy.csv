@@ -1,7 +1,7 @@
 ID,DisplayName,HP,BaseAtk,DesRes,EnlRes,BliRes,"RavRes ",DomRes,BehaviorID
 VillageEn1,Mad Cleric,100,22,3,3,3,3,3,710001
 VillageEn2,Bandit,75,30,3,3,3,3,3,710002
-VillageEn3,Hand Puppet,150,30,5,3,3,5,3,710003
-VillageEn4,Dying Villager,30,15,1,1,1,1,1,710004
+VillageEn3,Hand Puppet,125,30,5,3,3,5,3,710003
+VillageEn4,Dying Villager,50,15,1,1,1,1,1,710004
 VillageBoss1,Dark Consumed Priest,200,25,5,3,3,3,5,710005
 VillageBoss1,Light Consumed Priest,200,25,3,5,5,3,3,710006

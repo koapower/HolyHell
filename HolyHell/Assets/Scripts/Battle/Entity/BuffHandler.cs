@@ -33,26 +33,27 @@ namespace HolyHell.Battle.Entity
             // Check if buff already exists
             var existingBuff = activeBuffs.Find(b => b.Id == buff.Id);
 
+            string ownerName = GetOwnerName();
+
             if (existingBuff != null)
             {
                 // Check if buff is stackable
                 if (existingBuff.IsStackable)
                 {
-                    // Stack the buff (increase stack count)
                     existingBuff.StackCount.Value += buff.StackCount.Value;
-                    Debug.Log($"Buff {buff.Id} stacked to {existingBuff.StackCount}");
+                    Debug.Log($"[Buff] {ownerName} [{buff.Id}] stacked → {existingBuff.StackCount.Value}x");
                 }
 
                 // refresh duration
                 existingBuff.Duration.Value = buff.Duration.Value;
-                Debug.Log($"Buff {buff.Id} duration refreshed to {buff.Duration}");
+                Debug.Log($"[Buff] {ownerName} [{buff.Id}] duration refreshed → {existingBuff.Duration.Value} turns");
             }
             else
             {
                 // Add new buff
                 activeBuffs.Add(buff);
                 buff.OnApplied();
-                Debug.Log($"Buff {buff.Id} added with {buff.StackCount} stacks and {buff.Duration} duration");
+                Debug.Log($"[Buff] {ownerName} gained [{buff.Id}]  stacks={buff.StackCount.Value}  duration={buff.Duration.Value}");
             }
         }
 
@@ -62,7 +63,7 @@ namespace HolyHell.Battle.Entity
         public void RemoveBuff(string buffId)
         {
             activeBuffs.RemoveAll(b => b.Id == buffId);
-            Debug.Log($"Buff {buffId} removed");
+            Debug.Log($"[Buff] {GetOwnerName()} lost [{buffId}]");
         }
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace HolyHell.Battle.Entity
                 debuff.OnRemoved();
                 activeBuffs.Remove(debuff);
                 removedCount++;
-                Debug.Log($"Debuff {debuff.Id} removed by cleanse");
+                Debug.Log($"[Buff] {GetOwnerName()} cleansed [{debuff.Id}]");
             }
 
             return removedCount;
@@ -166,8 +167,19 @@ namespace HolyHell.Battle.Entity
             {
                 buff.OnRemoved();
                 activeBuffs.Remove(buff);
-                Debug.Log($"Buff {buff.Id} expired");
+                Debug.Log($"[Buff] {GetOwnerName()} [{buff.Id}] expired");
             }
+        }
+
+        // -----------------------------------------------------------------------
+        // Helpers
+        // -----------------------------------------------------------------------
+
+        private string GetOwnerName()
+        {
+            if (owner is EnemyEntity enemy && enemy.enemyData != null)
+                return enemy.enemyData.DisplayName;
+            return owner != null ? owner.name : "?";
         }
     }
 }
