@@ -1,6 +1,7 @@
 using HolyHell.Battle.Card;
 using HolyHell.Battle.Entity;
 using HolyHell.Battle.Logic;
+using HolyHell.Data.Type;
 using System.Collections.Generic;
 
 namespace HolyHell.Battle.Effect
@@ -23,6 +24,13 @@ namespace HolyHell.Battle.Effect
         // State
         public bool KillOccurred { get; set; }
         public CardInstance CurrentCard { get; set; }
+
+        /// <summary>
+        /// The element type of the skill/card being executed.
+        /// Used by damage effects to pass the correct element into DamageCalculator.
+        /// Set by CardEffectExecutor before executing each card/skill's effects.
+        /// </summary>
+        public ElementType SkillElementType { get; set; } = ElementType.None;
 
         // SpendRepeatTheRest: the full effect list of the current card and the index of SpendRepeatTheRest within it
         // SpendRepeatTheRestEffect uses these to know which effects come after it

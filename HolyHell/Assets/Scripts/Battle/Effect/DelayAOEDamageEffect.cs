@@ -27,7 +27,7 @@ namespace HolyHell.Battle.Effect
                     context.Caster,
                     damage,
                     delay,
-                    ElementType.None,
+                    context.SkillElementType,
                     null,
                     true // Target enemies
                 );

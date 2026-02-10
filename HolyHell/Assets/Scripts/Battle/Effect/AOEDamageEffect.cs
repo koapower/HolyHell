@@ -24,7 +24,7 @@ namespace HolyHell.Battle.Effect
             var targets = context.GetAliveEnemies();
             foreach (var enemy in targets)
             {
-                float finalDamage = DamageCalculator.CalculateDamage(baseDamage, context.Caster, enemy);
+                float finalDamage = DamageCalculator.CalculateDamage(baseDamage, context.Caster, enemy, context.SkillElementType);
                 bool killed = DamageCalculator.ApplyDamage(enemy, context.Caster, GameMath.RoundToInt(finalDamage));
                 if (killed) anyKilled = true;
             }

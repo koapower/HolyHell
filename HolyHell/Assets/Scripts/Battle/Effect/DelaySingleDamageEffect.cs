@@ -33,7 +33,7 @@ namespace HolyHell.Battle.Effect
                     context.Caster,
                     damage,
                     delay,
-                    ElementType.None,
+                    context.SkillElementType,
                     context.Target,
                     true
                 );

@@ -19,7 +19,7 @@ namespace HolyHell.Battle.Effect
             float percent = EffectValueParser.ParseFloat(Value);
             int healAmount = GameMath.RoundToInt(context.Caster.maxHp.CurrentValue * percent / 100f);
             DamageCalculator.ApplyHealing(context.Caster, healAmount);
-            Debug.Log($"SelfPercHeal: Healed caster for {healAmount} HP ({percent}% of max)");
+            Debug.Log($"SelfPercHeal: Healed caster for {healAmount} HP ({percent * 100}% of max)");
             return false;
         }
 

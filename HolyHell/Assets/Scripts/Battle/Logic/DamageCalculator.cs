@@ -2,123 +2,147 @@ using HolyHell.Battle.Entity;
 using HolyHell.Battle.Logic.Buffs;
 using HolyHell.Data.Type;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace HolyHell.Battle.Logic
 {
     /// <summary>
-    /// Calculates and applies damage with buff modifications
+    /// Calculates and applies damage / healing with full resistance and buff pipeline.
+    ///
+    /// Damage pipeline:
+    ///   1. baseDamage
+    ///   2. × attacker outgoing buff modifiers (BoostDmg, ReduceAtk, …)
+    ///   3. - element resistance  (defender base resistance from table + IncreaseResBuff - ReduceResBuff)
+    ///   4. × defender incoming buff modifiers (Fragile, Guard, …)
+    ///   → clamped to ≥ 0
+    ///
+    /// All intermediate values are written to Debug.Log for designer review.
     /// </summary>
     public static class DamageCalculator
     {
         /// <summary>
-        /// Calculate final damage with attacker/defender buff modifications and element resistance
+        /// Calculate final damage and return it.
+        /// Outputs a full breakdown log each time it is called.
         /// </summary>
-        public static float CalculateDamage(float baseDamage, BattleEntity attacker, BattleEntity defender, ElementType elementType = ElementType.None)
+        public static float CalculateDamage(
+            float baseDamage,
+            BattleEntity attacker,
+            BattleEntity defender,
+            ElementType elementType = ElementType.None)
         {
             float damage = baseDamage;
+            string attackerName = attacker != null ? GetEntityName(attacker) : "unknown";
+            string defenderName = defender != null ? GetEntityName(defender) : "unknown";
 
-            // Apply attacker's buffs (e.g., IncreaseDmg, BoostDmg, ReduceAtk)
-            if (attacker != null && attacker.buffHandler != null)
+            var log = new StringBuilder();
+            log.Append($"[Damage Calc] {attackerName} → {defenderName} | element={elementType} | base={baseDamage}");
+
+            // ── Step 1: attacker outgoing buff modifiers ──────────────────────
+            if (attacker?.buffHandler != null)
             {
+                float prev = damage;
                 damage = attacker.buffHandler.GetModifiedDamage(damage);
+                if (damage != prev)
+                    log.Append($"  +atk_buffs({damage - prev:+0.##;-0.##})={damage}");
             }
 
-            // Apply element resistance modifications
-            if (defender != null && defender.buffHandler != null)
+            // ── Step 2: element resistance ────────────────────────────────────
+            if (elementType != ElementType.None && defender != null)
             {
-                damage = ApplyElementResistance(damage, defender, elementType);
+                damage = ApplyElementResistance(damage, defender, elementType, log);
+            }
+            else
+            {
+                log.Append("  res=0(untyped)");
             }
 
-            // Apply defender's incoming damage buffs (e.g., Fragile, Guard)
-            if (defender != null && defender.buffHandler != null)
+            // ── Step 3: defender incoming buff modifiers ──────────────────────
+            if (defender?.buffHandler != null)
             {
+                float prev = damage;
                 damage = defender.buffHandler.GetModifiedIncomingDamage(damage);
+                if (damage != prev)
+                    log.Append($"  +def_buffs({damage - prev:+0.##;-0.##})={damage}");
             }
 
-            return Mathf.Max(0, damage); // Damage can't be negative
+            float finalDamage = Mathf.Max(0, damage);
+            log.Append($"  → FINAL={finalDamage}");
+            Debug.Log(log.ToString());
+
+            return finalDamage;
         }
 
         /// <summary>
-        /// Apply element resistance from buffs.
-        /// Formula: finalDamage = baseDamage - allResValue - elementResValue
-        /// If elementType is None (untyped damage), no resistance is applied at all.
-        /// AllRes buffs apply to every typed damage; element-specific buffs only apply to their matching type.
+        /// Apply all element resistance sources and append details to the log.
+        /// Formula: damage -= (baseResistance + allResBuff + elementResBuff)
         /// </summary>
-        private static float ApplyElementResistance(float damage, BattleEntity defender, ElementType elementType)
+        private static float ApplyElementResistance(
+            float damage,
+            BattleEntity defender,
+            ElementType elementType,
+            StringBuilder log)
         {
-            // Untyped damage bypasses all resistance
-            if (elementType == ElementType.None)
-            {
-                return damage;
-            }
-
             float totalResistance = 0f;
 
-            // --- All-resistance buffs (apply to any typed damage) ---
-            var allIncRes = defender.buffHandler.activeBuffs
+            // ── Base resistance from entity data (e.g. EnemyRow.BliRes) ───────
+            int baseRes = defender.GetBaseResistance(elementType);
+            totalResistance += baseRes;
+
+            // ── AllRes buff bonus (applies to every typed element) ────────────
+            float allIncRes = defender.buffHandler.activeBuffs
                 .OfType<IncreaseResBuff>()
-                .Where(b => b.ElementType == ElementType.All);
-            foreach (var buff in allIncRes)
-            {
-                totalResistance += buff.GetResistanceModifier();
-            }
+                .Where(b => b.ElementType == ElementType.All)
+                .Sum(b => b.GetResistanceModifier());
+            totalResistance += allIncRes;
 
-            var allDecRes = defender.buffHandler.activeBuffs
+            float allDecRes = defender.buffHandler.activeBuffs
                 .OfType<ReduceResBuff>()
-                .Where(b => b.ElementType == ElementType.All);
-            foreach (var buff in allDecRes)
-            {
-                totalResistance -= buff.GetResistanceModifier();
-            }
+                .Where(b => b.ElementType == ElementType.All)
+                .Sum(b => b.GetResistanceModifier());
+            totalResistance -= allDecRes;
 
-            // --- Element-specific resistance buffs ---
-            var elemIncRes = defender.buffHandler.activeBuffs
+            // ── Element-specific buff bonus ───────────────────────────────────
+            float elemIncRes = defender.buffHandler.activeBuffs
                 .OfType<IncreaseResBuff>()
-                .Where(b => b.ElementType == elementType);
-            foreach (var buff in elemIncRes)
-            {
-                totalResistance += buff.GetResistanceModifier();
-            }
+                .Where(b => b.ElementType == elementType)
+                .Sum(b => b.GetResistanceModifier());
+            totalResistance += elemIncRes;
 
-            var elemDecRes = defender.buffHandler.activeBuffs
+            float elemDecRes = defender.buffHandler.activeBuffs
                 .OfType<ReduceResBuff>()
-                .Where(b => b.ElementType == elementType);
-            foreach (var buff in elemDecRes)
-            {
-                totalResistance -= buff.GetResistanceModifier();
-            }
+                .Where(b => b.ElementType == elementType)
+                .Sum(b => b.GetResistanceModifier());
+            totalResistance -= elemDecRes;
 
-            // Subtract total resistance from damage (clamped to 0 by the caller)
+            log.Append($"  res=[base={baseRes} allBuff={allIncRes - allDecRes:+0.##;-0.##;0} elemBuff={elemIncRes - elemDecRes:+0.##;-0.##;0} total={totalResistance}]");
+
             return damage - totalResistance;
         }
 
         /// <summary>
-        /// Apply damage to target (shield absorbs first, then HP)
-        /// Returns true if target was killed
+        /// Apply final damage to target (shield absorbs first, then HP).
+        /// Returns true if the target was killed.
         /// </summary>
         public static bool ApplyDamage(BattleEntity target, BattleEntity attacker, int damage)
         {
             if (target == null)
-            {
                 return false;
-            }
 
             int damageInt = damage;
             string targetName   = GetEntityName(target);
             string attackerName = attacker != null ? GetEntityName(attacker) : "unknown";
 
-            // Shield absorbs damage first
+            // Shield absorbs first
             if (target.shield.CurrentValue > 0)
             {
                 int shieldDamage = Mathf.Min(target.shield.CurrentValue, damageInt);
                 target.shield.Value -= shieldDamage;
                 damageInt -= shieldDamage;
-
                 Debug.Log($"[Damage] {targetName} shield absorbed {shieldDamage}  (shield remaining: {target.shield.CurrentValue})");
             }
 
-            // Remaining damage goes to HP
+            // Remaining damage to HP
             if (damageInt > 0)
             {
                 int oldHp = target.hp.CurrentValue;
@@ -127,13 +151,10 @@ namespace HolyHell.Battle.Logic
 
                 // Track damage for Feared buff
                 var fearedBuff = target.buffHandler.GetBuff(BuffType.Feared.ToString()) as FearedBuff;
-                if (fearedBuff != null)
-                {
-                    fearedBuff.RecordDamage(damageInt);
-                }
+                fearedBuff?.RecordDamage(damageInt);
 
-                // Handle Lifesteel buff on attacker
-                if (attacker != null && attacker.buffHandler != null)
+                // Handle Lifesteal buff on attacker
+                if (attacker?.buffHandler != null)
                 {
                     var lifesteelBuff = attacker.buffHandler.GetBuff(BuffType.LifeSteal.ToString()) as LifesteelBuff;
                     if (lifesteelBuff != null && !lifesteelBuff.HasTriggered)
@@ -144,57 +165,45 @@ namespace HolyHell.Battle.Logic
                 }
             }
 
-            // Check for death
             bool wasKilled = target.hp.CurrentValue <= 0;
             if (wasKilled)
-            {
                 Debug.Log($"[Damage] {targetName} has been defeated!");
-            }
 
             return wasKilled;
         }
 
-        // -----------------------------------------------------------------------
-        // Helpers
-        // -----------------------------------------------------------------------
-
         /// <summary>
-        /// Returns a display-friendly name: EnemyEntity uses DisplayName, others use gameObject name.
+        /// Apply healing to target (capped at max HP, blocked by Cursed).
         /// </summary>
+        public static void ApplyHealing(BattleEntity target, int healAmount)
+        {
+            if (target == null)
+                return;
+
+            string targetName = GetEntityName(target);
+
+            if (target.buffHandler != null && target.buffHandler.HasBuff(BuffType.Cursed.ToString()))
+            {
+                Debug.Log($"[Heal] {targetName} is Cursed – healing nullified!");
+                return;
+            }
+
+            int actualHeal = Mathf.Min(healAmount, target.maxHp.CurrentValue - target.hp.CurrentValue);
+            if (actualHeal > 0)
+            {
+                int oldHp = target.hp.CurrentValue;
+                target.hp.Value += actualHeal;
+                Debug.Log($"[Heal] {targetName}: +{actualHeal} HP  (HP {oldHp} → {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
+            }
+        }
+
+        // ── Helpers ──────────────────────────────────────────────────────────
+
         private static string GetEntityName(BattleEntity entity)
         {
             if (entity is HolyHell.Battle.Entity.EnemyEntity enemy && enemy.enemyData != null)
                 return enemy.enemyData.DisplayName;
             return entity.name;
-        }
-
-        /// <summary>
-        /// Apply healing to target (can't exceed max HP)
-        /// Checks for Cursed buff
-        /// </summary>
-        public static void ApplyHealing(BattleEntity target, int healAmount)
-        {
-            if (target == null)
-            {
-                return;
-            }
-
-            string healTargetName = GetEntityName(target);
-
-            // Check for Cursed buff (nullifies all healing)
-            if (target.buffHandler != null && target.buffHandler.HasBuff(BuffType.Cursed.ToString()))
-            {
-                Debug.Log($"[Heal] {healTargetName} is Cursed – healing nullified!");
-                return;
-            }
-
-            int actualHeal = Mathf.Min(healAmount, target.maxHp.CurrentValue - target.hp.CurrentValue);
-
-            if (actualHeal > 0)
-            {
-                target.hp.Value += actualHeal;
-                Debug.Log($"[Heal] {healTargetName} healed {actualHeal} HP  (HP {target.hp.CurrentValue - actualHeal} → {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
-            }
         }
     }
 }

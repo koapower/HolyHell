@@ -1,6 +1,7 @@
 using HolyHell.Battle.Effect;
 using HolyHell.Battle.Entity;
 using HolyHell.Battle.Logic;
+using HolyHell.Data.Type;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,6 +44,8 @@ namespace HolyHell.Battle.Card
             context.Target = target;
             context.CurrentCard = card;
             context.KillOccurred = false;
+            // Forward the card's element type so damage effects can apply resistance correctly
+            context.SkillElementType = card.cardData?.ElementType ?? ElementType.None;
 
             // Execute all effects
             foreach (var effect in card.Effects)
@@ -139,9 +142,10 @@ namespace HolyHell.Battle.Card
         }
 
         /// <summary>
-        /// Execute effects directly (for AI or special cases)
+        /// Execute effects directly (used by EnemyAI and special cases).
+        /// Pass elementType so damage effects apply the correct elemental resistance.
         /// </summary>
-        public void ExecuteEffects(List<EffectBase> effects, BattleEntity target)
+        public void ExecuteEffects(List<EffectBase> effects, BattleEntity target, ElementType elementType = ElementType.None)
         {
             if (effects == null)
             {
@@ -151,6 +155,7 @@ namespace HolyHell.Battle.Card
 
             context.Target = target;
             context.KillOccurred = false;
+            context.SkillElementType = elementType;
 
             foreach (var effect in effects)
             {

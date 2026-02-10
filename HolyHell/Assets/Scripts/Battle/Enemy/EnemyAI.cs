@@ -97,11 +97,6 @@ namespace HolyHell.Battle.Enemy
             }
 
             // --- Step 2: apply condition bonuses ---
-            // Use player as the primary target for condition evaluation
-            BattleEntity targetForConditions = battleManager.Enemies.Count > 0
-                ? (BattleEntity)null   // will be resolved below
-                : null;
-
             // Resolve a sensible "target" entity for condition checks
             // (same player reference used during execution)
             BattleEntity condTarget = null;
@@ -110,13 +105,18 @@ namespace HolyHell.Battle.Enemy
                 if (ally != null && ally.hp.Value > 0) { condTarget = ally; break; }
             }
 
+            // Track blocking and boosting per slot for conflict detection
+            var slotBlocked    = new bool[MAX_SKILL_SLOTS + 1];    // true = force weight to 0
+            var slotBoostedBy  = new Dictionary<int, string>();     // slotIdx -> condition string that boosted it
+            var slotBlockedBy  = new Dictionary<int, string>();     // slotIdx -> condition string that blocked it
+
             for (int c = 1; c <= MAX_CONDITION_SLOTS; c++)
             {
                 var (condStr, resultStr) = behavior.GetConditionEntry(c);
                 if (string.IsNullOrEmpty(condStr) || string.IsNullOrEmpty(resultStr))
                     continue;
 
-                bool condMet = EnemyBehaviorCondition.Evaluate(
+                bool condMet = EnemyBehaviorCondition.EvaluateExpression(
                     condStr, enemy, condTarget, battleManager, turnNumber, castCountThisCombat);
 
                 if (!condMet) continue;
@@ -132,8 +132,37 @@ namespace HolyHell.Battle.Enemy
                 if (!int.TryParse(slotStr.Substring(5), out int slotIdx)) continue;
                 if (!float.TryParse(bonusStr, out float bonus)) continue;
 
-                if (slotIdx >= 1 && slotIdx <= MAX_SKILL_SLOTS)
+                if (slotIdx < 1 || slotIdx > MAX_SKILL_SLOTS) continue;
+
+                if (bonus == 0f)
+                {
+                    // bonus=0 means BLOCK this skill slot (force final weight to 0)
+                    slotBlocked[slotIdx] = true;
+                    slotBlockedBy[slotIdx] = $"Cond{c}[{condStr}]";
+                }
+                else
+                {
                     weights[slotIdx] += bonus;
+                    slotBoostedBy[slotIdx] = $"Cond{c}[{condStr}]+{bonus}";
+                }
+            }
+
+            // Conflict detection: same slot boosted AND blocked
+            for (int i = 1; i <= MAX_SKILL_SLOTS; i++)
+            {
+                if (slotBlocked[i] && slotBoostedBy.ContainsKey(i))
+                {
+                    Debug.LogError($"[EnemyAI] {enemy.enemyData?.DisplayName} Skill{i} has conflicting conditions: " +
+                                   $"boosted by {slotBoostedBy[i]}  AND  blocked by {slotBlockedBy[i]}. " +
+                                   $"Block wins. Check EnemyBehavior ID={enemy.behaviorRow?.Id}.");
+                }
+            }
+
+            // Apply blocks (forced weight = 0)
+            for (int i = 1; i <= MAX_SKILL_SLOTS; i++)
+            {
+                if (slotBlocked[i])
+                    weights[i] = 0f;
             }
 
             // --- Step 3: weighted random draw ---
@@ -205,7 +234,7 @@ namespace HolyHell.Battle.Enemy
                       $"on [{target.name}]  (cast #{castCountThisCombat})");
 
             var modifiedEffects = ApplyBaseAttackModifier(skill.DataRow.Effects);
-            effectExecutor.ExecuteEffects(modifiedEffects, target);
+            effectExecutor.ExecuteEffects(modifiedEffects, target, skill.DataRow.ElementType);
         }
 
         // -----------------------------------------------------------------------
@@ -233,7 +262,7 @@ namespace HolyHell.Battle.Enemy
                 var (condStr, resultStr) = behavior.GetConditionEntry(c);
                 if (string.IsNullOrEmpty(condStr)) continue;
 
-                bool met = EnemyBehaviorCondition.Evaluate(
+                bool met = EnemyBehaviorCondition.EvaluateExpression(
                     condStr, enemy, condTarget, battleManager, turnNumber, castCountThisCombat);
 
                 sb.Append($"\n  Cond{c} [{condStr}] = {(met ? "TRUE → +" + resultStr : "false")}");

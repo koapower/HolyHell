@@ -42,6 +42,13 @@ namespace HolyHell.Battle.Entity
             hp.Value = data.Hp;
             shield.Value = 0;
 
+            // Set base elemental resistances from table data
+            elementResistances[ElementType.Despair]     = data.DespairResistance;
+            elementResistances[ElementType.Enlightened] = data.EnlightenedResistance;
+            elementResistances[ElementType.Bliss]       = data.BlissResistance;
+            elementResistances[ElementType.Ravenous]    = data.RavenousResistance;
+            elementResistances[ElementType.Domination]  = data.DominationResistance;
+
             // Initialize AI
             ai = new EnemyAI(battleManager, this);
 
