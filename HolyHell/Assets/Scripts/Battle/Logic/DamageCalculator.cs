@@ -105,6 +105,8 @@ namespace HolyHell.Battle.Logic
             }
 
             int damageInt = damage;
+            string targetName   = GetEntityName(target);
+            string attackerName = attacker != null ? GetEntityName(attacker) : "unknown";
 
             // Shield absorbs damage first
             if (target.shield.CurrentValue > 0)
@@ -113,7 +115,7 @@ namespace HolyHell.Battle.Logic
                 target.shield.Value -= shieldDamage;
                 damageInt -= shieldDamage;
 
-                Debug.Log($"{target.GetType().Name} shield absorbed {shieldDamage} damage");
+                Debug.Log($"[Damage] {targetName} shield absorbed {shieldDamage}  (shield remaining: {target.shield.CurrentValue})");
             }
 
             // Remaining damage goes to HP
@@ -121,7 +123,7 @@ namespace HolyHell.Battle.Logic
             {
                 int oldHp = target.hp.CurrentValue;
                 target.hp.Value = Mathf.Max(0, target.hp.CurrentValue - damageInt);
-                Debug.Log($"{target.GetType().Name} took {damageInt} HP damage (HP: {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
+                Debug.Log($"[Damage] {attackerName} → {targetName}: {damageInt} dmg  (HP {oldHp} → {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
 
                 // Track damage for Feared buff
                 var fearedBuff = target.buffHandler.GetBuff(BuffType.Feared.ToString()) as FearedBuff;
@@ -146,10 +148,24 @@ namespace HolyHell.Battle.Logic
             bool wasKilled = target.hp.CurrentValue <= 0;
             if (wasKilled)
             {
-                Debug.Log($"{target.GetType().Name} has been defeated!");
+                Debug.Log($"[Damage] {targetName} has been defeated!");
             }
 
             return wasKilled;
+        }
+
+        // -----------------------------------------------------------------------
+        // Helpers
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Returns a display-friendly name: EnemyEntity uses DisplayName, others use gameObject name.
+        /// </summary>
+        private static string GetEntityName(BattleEntity entity)
+        {
+            if (entity is HolyHell.Battle.Entity.EnemyEntity enemy && enemy.enemyData != null)
+                return enemy.enemyData.DisplayName;
+            return entity.name;
         }
 
         /// <summary>
@@ -163,10 +179,12 @@ namespace HolyHell.Battle.Logic
                 return;
             }
 
+            string healTargetName = GetEntityName(target);
+
             // Check for Cursed buff (nullifies all healing)
             if (target.buffHandler != null && target.buffHandler.HasBuff(BuffType.Cursed.ToString()))
             {
-                Debug.Log($"{target.GetType().Name} is Cursed - healing nullified!");
+                Debug.Log($"[Heal] {healTargetName} is Cursed – healing nullified!");
                 return;
             }
 
@@ -175,7 +193,7 @@ namespace HolyHell.Battle.Logic
             if (actualHeal > 0)
             {
                 target.hp.Value += actualHeal;
-                Debug.Log($"{target.GetType().Name} healed for {actualHeal} HP (HP: {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
+                Debug.Log($"[Heal] {healTargetName} healed {actualHeal} HP  (HP {target.hp.CurrentValue - actualHeal} → {target.hp.CurrentValue}/{target.maxHp.CurrentValue})");
             }
         }
     }

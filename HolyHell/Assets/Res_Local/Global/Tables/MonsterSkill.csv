@@ -2,5 +2,18 @@ ID,DisplayName,Type,Effect1,EffectAtr1,Effect2,EffectAtr2,Effect3,EffectAtr3,VFX
 BliSingleTar1,Sunlight Ray,Bliss,SingleDamage,0.3
 LowHeal1,Life Line,Bliss,SelfPercHeal,0.2
 DomSingleTar1,Shank Slash,Domination,SingleDamage,0.1,SelfBuff,"BoostDmg,1,1,1"
-WasteTurn,Treature Hunt,Ravenous,,,,,,,,The bandit is searching nearby crates for goods...
+WasteTurn1,Treasure Hunt,Ravenous,,,,,,,,The bandit is searching nearby crates for goods...
 DomSingleTar2,Wound Stab,Domination,SingleDamage,0.3
+FearDebuff1,Limb Stretch,Despair,TargetSingleBuff,"Feared,20,1,3"
+DesSingleTar1,Arm Slam,Despair,SingleDamage,0.3
+StealBuff1,Flesh Seek,Ravenous,SelfBuff,"LifeSteal,1,1,2"
+WasteTurn2,Cry for Help,Despair,,,,,,,,You heard weeping mubles coming from the villager's mouth.
+CardSteal1,Desperate Grab,Ravenous,HandBurn,1,,,,,,Last ditch effort for survival...
+DelayDes1,Swirl of Grief,Despair,DelaySingleDamage,"0.4,2"
+DemonResBuff1,Sincere Prayers,Enlightened,SelfBuff,"IncreaseRavRes,4,1,3",SelfBuff,"IncreaseDesRes,4,1,3"
+RavSingleTar1,Soul Drain,Ravenous,SingleDamage,0.2,SelfFlatHeal,6
+DesResDebuff1,Corossive Mist,Bliss,TargetSingleBuff,"DecreaseDesRes,3,1,2"
+DomSingleTar3,Defiled Shards,Domination,SingleDamage,0.3,SelfDamage,6
+GuardBuff1,Fortified Will,Bliss,SelfBuff,"Guard,1,1,2"
+BliSingleTar2,Sunlight Burst,Bliss,SingleDamage,0.6
+AngelResBuff1,Sincere Prayers,Enlightened,SelfBuff,"DecreaseEnlRes,4,1,3",SelfBuff,"DecreaseBliRes,4,1,3"

@@ -59,7 +59,6 @@ public class BuffView : MonoBehaviour
 
     void BuffView_ViewChanged(in SynchronizedViewChangedEventArgs<BuffBase, GameObject> eventArgs)
     {
-        Debug.Log($"Buff changed: action {eventArgs.Action} old item {eventArgs.OldItem.Value?.Id} new item {eventArgs.NewItem.Value?.Id}");
         switch (eventArgs.Action)
         {
             case NotifyCollectionChangedAction.Add:

@@ -93,6 +93,9 @@ namespace HolyHell.Battle
                 // Trigger OnTurnStart for enemy buffs
                 enemy.buffHandler.OnTurnStart();
 
+                // Advance enemy AI turn counter (used for Turnpassed conditions)
+                enemy.ai?.OnTurnStart();
+
                 // Execute intent
                 enemy.ExecuteIntent(player);
             }
