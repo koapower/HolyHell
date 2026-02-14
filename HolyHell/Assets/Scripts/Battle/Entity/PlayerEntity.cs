@@ -29,6 +29,13 @@ namespace HolyHell.Battle.Entity
         {
             deckManager = new DeckManager(this);
             await deckManager.InitializeDeck(startingDeckCardIds);
+
+            // Set base elemental resistances (hard coded)
+            elementResistances[ElementType.Despair] = 5;
+            elementResistances[ElementType.Enlightened] = 5;
+            elementResistances[ElementType.Bliss] = 5;
+            elementResistances[ElementType.Ravenous] = 5;
+            elementResistances[ElementType.Domination] = 5;
         }
 
         protected override void OnDestroy()
