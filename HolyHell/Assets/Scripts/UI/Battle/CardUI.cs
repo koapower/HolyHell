@@ -11,6 +11,19 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
+/// Controls how a CardUI instance behaves in response to pointer events.
+/// InHand    - full battle hand logic (drag, state machine, use button)
+/// Preview   - hover highlight only, no click or drag
+/// DeckBuilding - hover highlight + left click triggers onDeckBuildClick
+/// </summary>
+public enum CardUIMode
+{
+    InHand,
+    Preview,
+    DeckBuilding
+}
+
+/// <summary>
 /// Displays a single card in hand
 /// Handles click, hover, and drag events
 /// </summary>
@@ -53,6 +66,12 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] private GameObject useButtonObject; // The Use button UI (child of this card)
     [SerializeField] private Button useButton; // Reference to the button component
 
+
+    // Current interaction mode; set before or after Initialize depending on use case
+    public CardUIMode currentMode = CardUIMode.InHand;
+
+    // Callback invoked on left-click when currentMode == DeckBuilding
+    public Action onDeckBuildClick;
 
     private BattleManager battleManager;
     private HandUI handUI;
@@ -126,6 +145,72 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         }
 
         UpdateDisplay();
+    }
+
+    /// <summary>
+    /// Initializes display from a raw CardRow (used in deck-building, no battle context needed).
+    /// Sets currentMode to DeckBuilding by default; caller can override.
+    /// </summary>
+    public void InitializeDeckBuild(CardRow cardRow, Action clickCallback = null)
+    {
+        currentMode = CardUIMode.DeckBuilding;
+        onDeckBuildClick = clickCallback;
+
+        if (cardRow == null) return;
+
+        if (cardNameText != null)
+        {
+            cardNameText.text = cardRow.DisplayName;
+            cardNameText.color = cardRow.Faction switch
+            {
+                Faction.Angel => angelColor,
+                Faction.Demon => demonColor,
+                _ => Color.white
+            };
+        }
+
+        if (costText != null)
+            costText.text = cardRow.ActionCost.ToString();
+
+        if (descriptionText != null)
+            descriptionText.text = cardRow.Description;
+
+        if (elementImage != null)
+        {
+            elementImage.color = cardRow.ElementType switch
+            {
+                ElementType.Bliss       => blissColor,
+                ElementType.Domination  => dominationColor,
+                ElementType.Enlightened => enlightendColor,
+                ElementType.Despair     => despairColor,
+                ElementType.Ravenous    => ravenousColor,
+                _                       => Color.white
+            };
+        }
+
+        if (angelGaugeText != null)
+        {
+            angelGaugeText.text = cardRow.AngelGaugeIncrease != 0
+                ? (cardRow.AngelGaugeIncrease > 0 ? $"+{cardRow.AngelGaugeIncrease}" : $"{cardRow.AngelGaugeIncrease}")
+                : "";
+        }
+
+        if (demonGaugeText != null)
+        {
+            demonGaugeText.text = cardRow.DemonGaugeIncrease != 0
+                ? (cardRow.DemonGaugeIncrease > 0 ? $"+{cardRow.DemonGaugeIncrease}" : $"{cardRow.DemonGaugeIncrease}")
+                : "";
+        }
+
+        if (angelBg != null) angelBg.gameObject.SetActive(cardRow.AngelGaugeIncrease != 0);
+        if (demonBg  != null) demonBg.gameObject.SetActive(cardRow.DemonGaugeIncrease != 0);
+
+        if (cardFrame != null)
+            cardFrame.color = GetFactionColor(cardRow.Faction);
+
+        // Hide use button in deck-build mode
+        if (useButtonObject != null)
+            useButtonObject.SetActive(false);
     }
 
     private void UpdateDisplay()
@@ -263,6 +348,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (!canInteract) return;
 
+        // State machine and drag are only active in InHand mode
+        if (currentMode != CardUIMode.InHand) return;
+
         // Handle state machine updates
         UpdateStateMachine();
 
@@ -384,7 +472,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         _delayLongTapSubscription?.Dispose();
         _delayLongTapSubscription = null;
-        if (battleManager != null && battleManager.currentPreviewCard != null)
+        if (currentMode == CardUIMode.InHand && battleManager != null && battleManager.currentPreviewCard != null)
             battleManager.currentPreviewCard.Value = null;
     }
 
@@ -423,10 +511,17 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
-        // only accept left click
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
-        // Click is only processed if we didn't drag
+        if (currentMode == CardUIMode.DeckBuilding)
+        {
+            onDeckBuildClick?.Invoke();
+            return;
+        }
+
+        if (currentMode == CardUIMode.Preview) return;
+
+        // InHand: click is only processed if we didn't drag
         if (hasMovedOutOfHandUI)
         {
             hasMovedOutOfHandUI = false;
@@ -446,11 +541,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerEnterHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (currentState == CardInteractionState.Idle)
-        {
-            isHovered = true;
-            UpdateVisual();
-        }
+        if (currentMode == CardUIMode.InHand && currentState != CardInteractionState.Idle) return;
+
+        isHovered = true;
+        UpdateVisual();
     }
 
     // IPointerExitHandler
@@ -463,8 +557,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (currentMode != CardUIMode.InHand) return;
+
         if (!isPlayable) return;
-        // only accept left click
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
         currentState = CardInteractionState.Pressing;
@@ -484,6 +579,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerUpHandler
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (currentMode != CardUIMode.InHand) return;
+
         CancelLongTapPreview();
 
         if (!isPlayable) return;
