@@ -29,6 +29,7 @@ public class FilterWindowUI : MonoBehaviour
     [SerializeField] private Toggle toggleFactionNeutral;
 
     [Header("GodType Toggles")]
+    [SerializeField] private Toggle toggleGodNone;
     [SerializeField] private Toggle toggleGodIntereon;
     [SerializeField] private Toggle toggleGodFlorentis;
     [SerializeField] private Toggle toggleGodEvinor;
@@ -81,6 +82,7 @@ public class FilterWindowUI : MonoBehaviour
         SetToggle(toggleFactionNeutral, workingFilter.factions.Contains(Faction.Neutral));
 
         // GodType
+        SetToggle(toggleGodNone,   workingFilter.godTypes.Contains(GodType.None));
         SetToggle(toggleGodIntereon,   workingFilter.godTypes.Contains(GodType.Intereon));
         SetToggle(toggleGodFlorentis,  workingFilter.godTypes.Contains(GodType.Florentis));
         SetToggle(toggleGodEvinor,     workingFilter.godTypes.Contains(GodType.Evinor));
@@ -135,6 +137,7 @@ public class FilterWindowUI : MonoBehaviour
         if (IsOn(toggleFactionNeutral)) workingFilter.factions.Add(Faction.Neutral);
 
         // GodType
+        if (IsOn(toggleGodNone))   workingFilter.godTypes.Add(GodType.None);
         if (IsOn(toggleGodIntereon))   workingFilter.godTypes.Add(GodType.Intereon);
         if (IsOn(toggleGodFlorentis))  workingFilter.godTypes.Add(GodType.Florentis);
         if (IsOn(toggleGodEvinor))     workingFilter.godTypes.Add(GodType.Evinor);

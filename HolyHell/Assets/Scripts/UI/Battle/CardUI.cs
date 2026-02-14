@@ -541,7 +541,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     // IPointerEnterHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Hover highlight applies in all modes
         if (currentMode == CardUIMode.InHand && currentState != CardInteractionState.Idle) return;
 
         isHovered = true;

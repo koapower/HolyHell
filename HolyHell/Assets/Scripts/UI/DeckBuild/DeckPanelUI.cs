@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -7,14 +8,14 @@ using UnityEngine;
 /// Displays the current deck being built.
 /// Each card slot shows a CardUI in DeckBuilding mode; clicking a card removes it from the deck.
 /// </summary>
-public class DeckPanelUI : MonoBehaviour
+public class DeckPanelUI : MonoBehaviour, IUIInitializable
 {
     [Header("Deck Name")]
     [SerializeField] private TMP_InputField deckNameInput;
 
     [Header("Card List")]
-    [SerializeField] private Transform cardContainer;   // Parent for instantiated card slots
-    [SerializeField] private CardSlotUI cardSlotPrefab; // Prefab: CardSlotUI + CardSlotSizer + CardUI
+    [SerializeField] private Transform cardContainer;
+    [SerializeField] private CardSlotUI cardSlotPrefab;
 
     [Header("Deck Build Controller (for hover)")]
     [SerializeField] private DeckBuildUI deckBuildUI;
@@ -22,9 +23,10 @@ public class DeckPanelUI : MonoBehaviour
     private readonly List<CardSlotUI> activeSlots = new List<CardSlotUI>();
     private ITableManager tableManager;
 
-    private async void Start()
+    public async UniTask Init()
     {
         tableManager = await ServiceLocator.Instance.GetAsync<ITableManager>();
+        cardSlotPrefab.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -51,6 +53,7 @@ public class DeckPanelUI : MonoBehaviour
             if (cardRow == null) continue;
 
             var slot = Instantiate(cardSlotPrefab, cardContainer);
+            slot.gameObject.SetActive(true);
             activeSlots.Add(slot);
 
             // Capture for closure
@@ -61,10 +64,9 @@ public class DeckPanelUI : MonoBehaviour
             {
                 slot.cardUI.InitializeDeckBuild(cardRow, clickCallback: () => onCardClicked?.Invoke(capturedId));
 
-                // Wire hover to detail panel via DeckBuildUI
-                var canvasGroup = slot.cardUI.GetComponent<CanvasGroup>();
-                // Use pointer enter/exit via a helper component if needed,
-                // or rely on DeckBuildUI polling; for simplicity expose an event below.
+                var cardUIGo = slot.cardUI.gameObject;
+                var hoverTrigger = cardUIGo.AddComponent<CardDbHoverTrigger>();
+                hoverTrigger.Setup(cardRow, deckBuildUI);
             }
         }
     }

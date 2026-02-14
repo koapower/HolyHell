@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 /// The card database panel in deck building.
 /// Shows all cards with search, filter, and sort controls.
 /// </summary>
-public class CardDbPanelUI : MonoBehaviour
+public class CardDbPanelUI : MonoBehaviour, IUIInitializable
 {
     [Header("Search")]
     [SerializeField] private TMP_InputField searchInputField;
@@ -27,7 +28,7 @@ public class CardDbPanelUI : MonoBehaviour
 
     private readonly List<CardSlotUI> activeSlots = new List<CardSlotUI>();
 
-    private void Start()
+    public UniTask Init()
     {
         if (searchInputField != null)
             searchInputField.onValueChanged.AddListener(OnSearchChanged);
@@ -40,6 +41,10 @@ public class CardDbPanelUI : MonoBehaviour
 
         if (clearFilterButton != null)
             clearFilterButton.onClick.AddListener(() => deckBuildUI?.ClearFilter());
+
+        cardSlotPrefab.gameObject.SetActive(false);
+
+        return UniTask.CompletedTask;
     }
 
     private void OnSearchChanged(string query)
@@ -61,6 +66,7 @@ public class CardDbPanelUI : MonoBehaviour
         foreach (var cardRow in cards)
         {
             var slot = Instantiate(cardSlotPrefab, cardContainer);
+            slot.gameObject.SetActive(true);
             activeSlots.Add(slot);
 
             CardRow captured = cardRow;

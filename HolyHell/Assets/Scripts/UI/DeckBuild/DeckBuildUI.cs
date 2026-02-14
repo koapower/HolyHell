@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// Root controller for the deck-building screen.
 /// Owns the current deck being edited, the card database, and coordinates all sub-panels.
 /// </summary>
-public class DeckBuildUI : MonoBehaviour
+public class DeckBuildUI : MonoBehaviour, IUIInitializable
 {
     [Header("Sub-panels")]
     [SerializeField] private CardDetailPanelUI cardDetailPanel;
@@ -31,9 +31,8 @@ public class DeckBuildUI : MonoBehaviour
     public SortField CurrentSortField { get; private set; } = SortField.Id;
     public bool SortAscending { get; private set; } = true;
 
-    private async void Start()
+    public async UniTask Init()
     {
-        // Wait for the table manager service to be ready before querying cards
         var tableManager = await ServiceLocator.Instance.GetAsync<ITableManager>();
         cardDatabase = new CardDatabase(tableManager);
 
@@ -44,10 +43,13 @@ public class DeckBuildUI : MonoBehaviour
             allDecks.Add(new DeckData());
         }
 
-        Open(allDecks[0]);
-
         saveButton?.onClick.AddListener(Save);
         closeButton?.onClick.AddListener(Close);
+    }
+
+    private void Start()
+    {
+        Open(allDecks[0]);
     }
 
     /// <summary>

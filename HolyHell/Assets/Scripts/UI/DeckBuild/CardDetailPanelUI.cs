@@ -8,10 +8,11 @@ using UnityEngine;
 public class CardDetailPanelUI : MonoBehaviour
 {
     [Header("Card Visual")]
-    [SerializeField] private CardSlotUI cardSlot;   // CardSlotSizer should be on the parent
+    [SerializeField] private CardSlotUI cardSlot;
 
     [Header("Info Texts")]
     [SerializeField] private TextMeshProUGUI cardIdText;
+    [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private TextMeshProUGUI typeText;
     [SerializeField] private TextMeshProUGUI factionText;
     [SerializeField] private TextMeshProUGUI godhoodText;
@@ -29,6 +30,7 @@ public class CardDetailPanelUI : MonoBehaviour
         if (card == null) return;
 
         if (cardIdText    != null) cardIdText.text    = card.Id;
+        if (cardNameText  != null) cardNameText.text  = card.DisplayName;
         if (typeText      != null) typeText.text      = card.ElementType.ToString();
         if (factionText   != null) factionText.text   = card.Faction.ToString();
         if (godhoodText   != null) godhoodText.text   = card.GodType.ToString();

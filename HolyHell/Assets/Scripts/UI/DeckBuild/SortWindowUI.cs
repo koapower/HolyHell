@@ -30,7 +30,7 @@ public class SortWindowUI : MonoBehaviour
 
     private void Start()
     {
-        cancelButton?.onClick.AddListener(OnCancelClicked);
+        cancelButton?.onClick.AddListener(OnCloseClicked);
 
         // Sort field toggles
         AddFieldListener(toggleSortId,         SortField.Id);
@@ -72,7 +72,7 @@ public class SortWindowUI : MonoBehaviour
         SetToggleWithoutNotify(toggleDescending, !ascending);
     }
 
-    private void OnCancelClicked()
+    private void OnCloseClicked()
     {
         gameObject.SetActive(false);
     }
