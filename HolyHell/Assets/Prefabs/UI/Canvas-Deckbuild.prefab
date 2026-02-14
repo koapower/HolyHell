@@ -1700,7 +1700,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3261960492375694327}
   toggleTransition: 1
   graphic: {fileID: 7016303354192223756}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2343,7 +2343,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1285129540649140939}
   toggleTransition: 1
   graphic: {fileID: 6698456619340747132}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -3766,7 +3766,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8623707230897172326}
   toggleTransition: 1
   graphic: {fileID: 6657779412185155341}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4150,7 +4150,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2267286401602199913}
   toggleTransition: 1
   graphic: {fileID: 5659172372721169779}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4310,7 +4310,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8290791799159342844}
   toggleTransition: 1
   graphic: {fileID: 7406846413575768205}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 1532510387164135166}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -8934,7 +8934,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2390810052248364932}
   toggleTransition: 1
   graphic: {fileID: 3715697039744149566}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11247,7 +11247,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7130132454209245536}
   toggleTransition: 1
   graphic: {fileID: 3242718694467448257}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 3710095130242025563}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -17934,7 +17934,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3536640882742432926}
   toggleTransition: 1
   graphic: {fileID: 492175681752452077}
-  m_Group: {fileID: 0}
+  m_Group: {fileID: 1532510387164135166}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
